@@ -7,11 +7,11 @@ DEBUG = True
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'USER': config('DB_USER'),
-        'PASSWORD': config("DB_PASSWORD"),
-        'NAME': config('DB_NAME'),
-        'HOST': config('DB_HOST'),
-        # 'PORT': config('DB_PORT'),
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
+        'NAME': 'rabiie',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 TEMPLATES = [
@@ -31,10 +31,10 @@ TEMPLATES = [
 ]
 ALLOWED_HOSTS = ['*']
 STATIC_URL = "/static/"
-STATIC_ROOT = "/home/app/web/staticfiles"
-# STATICFILES_DIRS = ["/home/app/azmon/web/staticfiles", ]
+STATIC_ROOT = "/home/ubuntu/rabiie/staticfiles"
+# STATICFILES_DIRS = ["/home/ubuntu/rabiie/staticfiles", ]
 MEDIA_URL = "/media/"
-MEDIA_ROOT = "/home/app/web/mediafiles"
+MEDIA_ROOT = "/home/ubuntu/rabiie/mediafiles"
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=4),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=45),

@@ -1,1 +1,0 @@
-from account.urls import *

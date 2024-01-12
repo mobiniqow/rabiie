@@ -1,0 +1,19 @@
+[Unit]
+Description=gunicorn daemon
+Requires=rabiie.socket
+After=network.target
+
+
+[Service]
+User=ubuntu
+Group=www-data
+WorkingDirectory=/home/ubuntu/rabiie
+ExecStart=/home/ubuntu/rabiie/venv/bin/gunicorn \
+    --access-logfile - \
+    --workers 3 \
+    --bind unix:/run/rabiie.sock \
+    core.wsgi:application \
+    --env DJANGO_SETTINGS_MODULE=core.settings.prod
+
+[Install]
+WantedBy=multi-user.target

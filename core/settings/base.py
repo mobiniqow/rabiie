@@ -11,9 +11,9 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
-    "account",
+    "authenticate",
     'device',
-    'user-device'
+    'user_device',
     "drf_yasg",
 ]
 # DATA_UPLOAD_MAX_MEMORY_SIZE = 524288022
@@ -44,7 +44,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-AUTH_USER_MODEL = "account.User"
+AUTH_USER_MODEL = "authenticate.User"
 
 LANGUAGE_CODE = "en-us"
 

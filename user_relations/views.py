@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import UserChild
-from account.models import User
+from authenticate.models import User
 
 
 class UserChildManipulation(APIView):

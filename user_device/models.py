@@ -1,7 +1,7 @@
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
-from account.models import User
+from authenticate.models import User
 from device.models import DeviceFactory, BaseModel
 
 
