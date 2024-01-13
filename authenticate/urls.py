@@ -10,11 +10,9 @@ urlpatterns = [
     path("login", LoginUser.as_view()),
     path('terms', terms_and_conditions),
     # access
-    path("access", get_access),
     path("verify", VerifyUser.as_view()),
     path("profile", UserProfile.as_view()),
     path('', include(router.urls)),
-    path('find-by-id', get_user_by_national_id),
 ]
 
 # todo vase amar moameat mitonam begam onaie ke to list alan nabodan ro hazv kon va create or update konam

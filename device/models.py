@@ -46,6 +46,7 @@ class Humidity(BaseModel):
 
 
 class DeviceFactory(BaseModel):
+
     DEVICE_CHOICES = [
         ('relay', 'Relay'),
         ('keyed_device', 'Keyed Device'),
@@ -56,6 +57,6 @@ class DeviceFactory(BaseModel):
     name = models.CharField(max_length=50)
     device_type = models.CharField(choices=DEVICE_CHOICES, max_length=20)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     content_object = GenericForeignKey('content_type', 'object_id')

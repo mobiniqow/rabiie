@@ -12,9 +12,12 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "authenticate",
+    "drf_yasg",
+    'room',
     'device',
     'user_device',
-    "drf_yasg",
+    'user_relations',
+    'protocol',
 ]
 # DATA_UPLOAD_MAX_MEMORY_SIZE = 524288022
 MIDDLEWARE = [

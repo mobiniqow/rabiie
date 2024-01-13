@@ -1,35 +1,33 @@
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.viewsets import ModelViewSet
 from .models import Room, RoomDevice
 from .serializers import RoomSerializer, RoomDeviceSerializer
 
 
-class RoomView(APIView):
-    def get(self, request):
-        user = request.user  # جایگزین کردن این خط با مکانیزم احراز هویت خودتان
-        rooms = Room.objects.filter(user=user)
-        serializer = RoomSerializer(rooms, many=True)
-        return Response(serializer.data)
+class RoomView(ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = RoomSerializer
 
-    def post(self, request):
-        serializer = RoomSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(user=request.user)  # جایگزین کردن این خط با مکانیزم احراز هویت خودتان
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def get_queryset(self):
+        user = self.request.user
+        return Room.objects.filter(user=user)
 
 
 class RoomDeviceView(APIView):
-    def get(self, request):
-        user = request.user  # جایگزین کردن این خط با مکانیزم احراز هویت خودتان
-        rooms = Room.objects.filter(user=user)
-        devices = RoomDevice.objects.filter(room__in=rooms)
+    def get(self, request, room_id):
+        user = request.user
+        devices = RoomDevice.objects.filter(room__user=user, room_id=room_id)
         serializer = RoomDeviceSerializer(devices, many=True)
         return Response(serializer.data)
 
-    def post(self, request):
-        serializer = RoomDeviceSerializer(data=request.data)
+    def post(self, request, room_id):
+        var = {}
+        var.update(request.data)
+        var['room'] = room_id
+        serializer = RoomDeviceSerializer(data=var,)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
