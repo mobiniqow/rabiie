@@ -40,9 +40,7 @@ urlpatterns = [
         path("account/", include("authenticate.urls")),
         path('room/', include('room.urls')),
         path('device/', include('device.urls')),
-        path('my-device/', include('user_device.urls')),
         path('user-relation/', include('user_relations.urls')),
-
     ])),
     path("swagger.json", schema_view.without_ui(cache_timeout=0), name="schema-json"),
     path(

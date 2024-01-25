@@ -15,7 +15,6 @@ INSTALLED_APPS = [
     "drf_yasg",
     'room',
     'device',
-    'user_device',
     'user_relations',
     'protocol',
 ]

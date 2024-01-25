@@ -1,9 +1,40 @@
-from rest_framework.generics import ListAPIView
+from rest_framework import status, viewsets
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from device.models import KeyedDevice
-from device.serializers import KeyedDeviceSerializers
+from device.models import Relay12, Relay6
+from device.serializers import Relay12Serializer, Relay6Serializer
 
 
-class DeviceListView(ListAPIView):
-    serializer_class = KeyedDeviceSerializers
-    queryset = KeyedDevice.objects.filter(state=KeyedDevice.State.ACTIVE)
+@api_view(("GET",))
+def search_device(request, product_id):
+    if request.method == 'GET':
+        devices = Relay12.objects.filter(product_id=product_id)
+
+        if not devices.exists():
+            devices = Relay6.objects.filter(product_id=product_id)
+
+        if not devices.exists():
+            return Response({"message": "device not found"},
+                            status=status.HTTP_404_NOT_FOUND)
+
+        device = devices.first()
+        device.reset()
+        device.user = request.user
+        device.save()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class DeviceViewSet(APIView):
+    def get(self, request, ):
+        r12_devices = Relay12.objects.filter(user=request.user)
+        r6_devices = Relay6.objects.filter(user=request.user)
+        r12_serializer = Relay12Serializer(r12_devices, many=True)
+        r6_serializer = Relay6Serializer(r6_devices, many=True)
+        return Response(
+            {
+                "r12": r12_serializer.data,
+                "r6": r6_serializer.data
+            })
