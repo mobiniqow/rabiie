@@ -1,7 +1,9 @@
 from django.db import models
 import uuid
-
+import requests
 from authenticate.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 class Device(models.Model):
@@ -102,8 +104,6 @@ class Relay12(BaseRelay):
     r8 = models.BooleanField()
     r9 = models.BooleanField()
     r10 = models.BooleanField()
-    r11 = models.BooleanField()
-    r12 = models.BooleanField()
 
     device_r1 = models.ForeignKey(Device, on_delete=models.SET_NULL, null=True, blank=True,
                                   related_name='relay12_device_r1')
@@ -129,3 +129,25 @@ class Relay12(BaseRelay):
                                    related_name='relay12_device_r11')
     device_r12 = models.ForeignKey(Device, on_delete=models.SET_NULL, null=True, blank=True,
                                    related_name='relay12_device_r12')
+
+
+@receiver(post_save, sender=Relay12)
+def relay12_saved(sender, instance, created, **kwargs):
+    result = [
+        instance.r1, instance.r2,
+        instance.r3, instance.r4,
+        instance.r5, instance.r6,
+        instance.r7, instance.r8,
+        instance.r9, instance.r10,
+    ]
+
+    url = "localhost:8080/"
+
+    payload = 'client_id=127.0.0.1%3A52062&r1=false&r2=false&r3=false&r4=false&r5=false&r6=false&r7=false&r8=true&r9=true'
+    headers = {
+        'Content-Type': 'application/x-www-form-urlencoded'
+    }
+
+    response = requests.request("POST", url, headers=headers, data=payload)
+
+    print(response)
