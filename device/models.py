@@ -10,6 +10,7 @@ class Device(models.Model):
     image = models.ImageField(upload_to='device/image')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    client_id = models.CharField(max_length=55, blank=True, null=True)
 
     def __str__(self):
         return self.name
