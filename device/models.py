@@ -12,7 +12,6 @@ class Device(models.Model):
     image = models.ImageField(upload_to='device/image')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    client_id = models.CharField(max_length=55, blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -44,6 +43,7 @@ class BaseRelay(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    client_id = models.CharField(max_length=55, blank=True, null=True)
     state = models.IntegerField(choices=State.choices, default=State.FREE)
     product_id = models.CharField(max_length=22, db_index=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
