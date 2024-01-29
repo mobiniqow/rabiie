@@ -47,14 +47,13 @@ class BaseRelay(models.Model):
     state = models.IntegerField(choices=State.choices, default=State.FREE)
     product_id = models.CharField(max_length=22, db_index=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    schedular = models.BooleanField(default=False)
 
     def reset(self):
-        # Get all the boolean field names starting with 'r' and set them to False
         bool_fields = [field.name for field in self._meta.get_fields() if isinstance(field, models.BooleanField)]
         for field_name in bool_fields:
             setattr(self, field_name, False)
 
-        # Get all the foreign key field names starting with 'device_r' and set them to None
         fk_fields = [field.name for field in self._meta.get_fields() if isinstance(field, models.ForeignKey)
                      and field.name.startswith('device_r')]
         for field_name in fk_fields:
