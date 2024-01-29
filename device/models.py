@@ -133,13 +133,6 @@ class Relay12(BaseRelay):
 
 @receiver(post_save, sender=Relay12)
 def relay12_saved(sender, instance, created, **kwargs):
-    result = [
-        instance.r1, instance.r2,
-        instance.r3, instance.r4,
-        instance.r5, instance.r6,
-        instance.r7, instance.r8,
-        instance.r9, instance.r10,
-    ]
 
     url = "http://127.0.0.1:8080/"
 
@@ -155,11 +148,9 @@ def relay12_saved(sender, instance, created, **kwargs):
         f'&r8={instance.r8}'
         f'&r9={instance.r9}'
         f'&r10={instance.r10}'
-               )
+    )
     headers = {
         'Content-Type': 'application/x-www-form-urlencoded'
     }
 
     response = requests.request("POST", url, headers=headers, data=payload)
-
-    print(response)

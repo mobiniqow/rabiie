@@ -37,7 +37,7 @@ def search_device(request, product_id):
         return Response({"message": serializer.data})
 
 
-@api_view(("PATCH",))
+@api_view(("PATCH", "GET"))
 def search_device_socket(request, product_id):
     if request.method == 'GET':
         devices = Relay12.objects.filter(product_id=product_id)
@@ -58,6 +58,24 @@ def search_device_socket(request, product_id):
             serializer = Relay12Serializer(devices.first(), data=request.data, partial=True)
         if not devices.exists():
             devices = Relay6.objects.filter(product_id=product_id)
+            if devices.exists():
+                serializer = Relay6Serializer(devices.first(), data=request.data, partial=True)
+        if not devices.exists():
+            return Response({"message": "object not found"}, status=status.HTTP_404_NOT_FOUND)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"message": serializer.data})
+
+
+@api_view(("PATCH",))
+def client_device(request, client_id):
+    if request.method == "PATCH":
+        devices = Relay12.objects.filter(client_id=client_id)
+        print(request.data)
+        if devices.exists():
+            serializer = Relay12Serializer(devices.first(), data=request.data, partial=True)
+        if not devices.exists():
+            devices = Relay6.objects.filter(client_id=client_id)
             if devices.exists():
                 serializer = Relay6Serializer(devices.first(), data=request.data, partial=True)
         if not devices.exists():
