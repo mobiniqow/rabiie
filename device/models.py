@@ -141,9 +141,21 @@ def relay12_saved(sender, instance, created, **kwargs):
         instance.r9, instance.r10,
     ]
 
-    url = "localhost:8080/"
+    url = "http://127.0.0.1:8080/"
 
-    payload = 'client_id=127.0.0.1%3A52062&r1=false&r2=false&r3=false&r4=false&r5=false&r6=false&r7=false&r8=true&r9=true'
+    payload = (
+        f'client_id={instance.client_id}'
+        f'&r1={instance.r1}'
+        f'&r2={instance.r2}'
+        f'&r3={instance.r3}'
+        f'&r4={instance.r4}'
+        f'&r5={instance.r5}'
+        f'&r6={instance.r6}'
+        f'&r7={instance.r7}'
+        f'&r8={instance.r8}'
+        f'&r9={instance.r9}'
+        f'&r10={instance.r10}'
+               )
     headers = {
         'Content-Type': 'application/x-www-form-urlencoded'
     }
