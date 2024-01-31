@@ -17,6 +17,7 @@ INSTALLED_APPS = [
     'device',
     'user_relations',
     'protocol',
+    'message_warehouse',
 ]
 # DATA_UPLOAD_MAX_MEMORY_SIZE = 524288022
 MIDDLEWARE = [
@@ -27,6 +28,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+
 ]
 APPEND_SLASH = False
 ROOT_URLCONF = "core.urls"

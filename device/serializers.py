@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Relay12, Relay6
+from .models import Relay10, Relay6
 
 
 class Relay6Serializer(serializers.ModelSerializer):
@@ -9,8 +9,8 @@ class Relay6Serializer(serializers.ModelSerializer):
         read_only_fields = ("id", "product_id", "user")
 
 
-class Relay12Serializer(serializers.ModelSerializer):
+class Relay10Serializer(serializers.ModelSerializer):
     class Meta:
-        model = Relay12
+        model = Relay10
         fields = '__all__'
         read_only_fields = ("id", "product_id", "user")

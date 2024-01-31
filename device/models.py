@@ -5,6 +5,8 @@ from authenticate.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+from message_warehouse.models import MessageWareHouse
+
 
 class Device(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
@@ -92,7 +94,7 @@ class Relay6(BaseRelay):
                                   related_name='relay6_device_r6')
 
 
-class Relay12(BaseRelay):
+class Relay10(BaseRelay):
     r1 = models.BooleanField()
     r2 = models.BooleanField()
     r3 = models.BooleanField()
@@ -105,51 +107,52 @@ class Relay12(BaseRelay):
     r10 = models.BooleanField()
 
     device_r1 = models.ForeignKey(Device, on_delete=models.SET_NULL, null=True, blank=True,
-                                  related_name='relay12_device_r1')
+                                  related_name='relay10_device_r1')
     device_r2 = models.ForeignKey(Device, on_delete=models.SET_NULL, null=True, blank=True,
-                                  related_name='relay12_device_r2')
+                                  related_name='relay10_device_r2')
     device_r3 = models.ForeignKey(Device, on_delete=models.SET_NULL, null=True, blank=True,
-                                  related_name='relay12_device_r3')
+                                  related_name='relay10_device_r3')
     device_r4 = models.ForeignKey(Device, on_delete=models.SET_NULL, null=True, blank=True,
-                                  related_name='relay12_device_r4')
+                                  related_name='relay10_device_r4')
     device_r5 = models.ForeignKey(Device, on_delete=models.SET_NULL, null=True, blank=True,
-                                  related_name='relay12_device_r5')
+                                  related_name='relay10_device_r5')
     device_r6 = models.ForeignKey(Device, on_delete=models.SET_NULL, null=True, blank=True,
-                                  related_name='relay12_device_r6')
+                                  related_name='relay10_device_r6')
     device_r7 = models.ForeignKey(Device, on_delete=models.SET_NULL, null=True, blank=True,
-                                  related_name='relay12_device_r7')
+                                  related_name='relay10_device_r7')
     device_r8 = models.ForeignKey(Device, on_delete=models.SET_NULL, null=True, blank=True,
-                                  related_name='relay12_device_r8')
+                                  related_name='relay10_device_r8')
     device_r9 = models.ForeignKey(Device, on_delete=models.SET_NULL, null=True, blank=True,
-                                  related_name='relay12_device_r9')
+                                  related_name='relay10_device_r9')
     device_r10 = models.ForeignKey(Device, on_delete=models.SET_NULL, null=True, blank=True,
-                                   related_name='relay12_device_r10')
+                                   related_name='relay10_device_r10')
     device_r11 = models.ForeignKey(Device, on_delete=models.SET_NULL, null=True, blank=True,
-                                   related_name='relay12_device_r11')
+                                   related_name='relay10_device_r11')
     device_r12 = models.ForeignKey(Device, on_delete=models.SET_NULL, null=True, blank=True,
-                                   related_name='relay12_device_r12')
+                                   related_name='relay10_device_r12')
+
+    def get_status(self):
+        payload = (
+            f'r1={self.r1}\r\n'
+            f'r2={self.r2}\r\n'
+            f'r3={self.r3}\r\n'
+            f'r4={self.r4}\r\n'
+            f'r5={self.r5}\r\n'
+            f'r6={self.r6}\r\n'
+            f'r7={self.r7}\r\n'
+            f'r8={self.r8}\r\n'
+            f'r9={self.r9}\r\n'
+            f'r10={self.r10}\r\n'
+            f'schedular={1 if self.schedular else 0}\r\n'
+        )
+        return payload
 
 
-@receiver(post_save, sender=Relay12)
-def relay12_saved(sender, instance, created, **kwargs):
-
-    url = "http://127.0.0.1:8080/"
-
-    payload = (
-        f'client_id={instance.client_id}'
-        f'&r1={instance.r1}'
-        f'&r2={instance.r2}'
-        f'&r3={instance.r3}'
-        f'&r4={instance.r4}'
-        f'&r5={instance.r5}'
-        f'&r6={instance.r6}'
-        f'&r7={instance.r7}'
-        f'&r8={instance.r8}'
-        f'&r9={instance.r9}'
-        f'&r10={instance.r10}'
-    )
-    headers = {
-        'Content-Type': 'application/x-www-form-urlencoded'
-    }
-
-    response = requests.request("POST", url, headers=headers, data=payload)
+@receiver(post_save, sender=Relay10)
+def relay10_saved(sender, instance, created, **kwargs):
+    # todo instance.get_status ro bayad be client befrestonam
+    MessageWareHouse(
+        relay10_id=instance.id,
+        message=instance.get_status(),
+        client=instance.product_id
+    ).save()

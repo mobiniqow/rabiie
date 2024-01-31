@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Relay6, Relay12, Device, Psychrometer
+from .models import Relay6, Relay10, Device, Psychrometer
 
 
 class Relay6Admin(admin.ModelAdmin):
@@ -27,7 +27,7 @@ class Relay6Admin(admin.ModelAdmin):
         return super().get_queryset(request).select_related('user')
 
 
-class Relay12Admin(admin.ModelAdmin):
+class Relay10Admin(admin.ModelAdmin):
     list_display = [
         'id',
         'state',
@@ -51,6 +51,6 @@ class Relay12Admin(admin.ModelAdmin):
 
 
 admin.site.register(Relay6, Relay6Admin)
-admin.site.register(Relay12, Relay12Admin)
+admin.site.register(Relay10, Relay10Admin)
 admin.site.register(Device)
 admin.site.register(Psychrometer)

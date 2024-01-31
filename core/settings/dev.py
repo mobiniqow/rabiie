@@ -11,16 +11,16 @@ INSTALLED_APPS.append("django_extensions")
 os.environ["DJANGO_SETTINGS_MODULE"] = "core.settings.dev"
 ALLOWED_HOSTS = ["*"]
 #
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'world',
-#         'USER': 'mobiniqow',
-#         'PASSWORD': 'docker',
-#         'HOST': 'db',
-#         'PORT': 5432
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'tt',
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
+        'HOST': 'localhost',
+        'PORT': 5432
+    }
+}
 
 TEMPLATES = [
     {
@@ -37,12 +37,12 @@ TEMPLATES = [
         },
     },
 ]
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 MIDDLEWARE.append("debug_toolbar.middleware.DebugToolbarMiddleware")
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 # STATICFILES_DIRS  = [os.path.join(BASE_DIR, "static")]
@@ -62,15 +62,16 @@ REST_FRAMEWORK = {
         # 'uploads': '20/day'
     },
 }
-# debug toolbar config
+
 INTERNAL_IPS = [
     "127.0.0.1",
     "localhost",
 ]
-# show in drf
+
 DEBUG_TOOLBAR_CONFIG = {
     "SHOW_TOOLBAR_CALLBACK": lambda request: True,
 }
+
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=14),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=45),
