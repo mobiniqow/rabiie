@@ -11,8 +11,7 @@ class MessageWareHouse(models.Model):
                                related_name='relay_6')
     relay10 = models.ForeignKey('device.Relay10', on_delete=models.SET_NULL, blank=True, null=True,
                                 related_name='relay_10')
-    status = models.IntegerField(choices=State.choices, default=State.SUSPEND)
+    state = models.IntegerField(choices=State.choices, default=State.SUSPEND)
     message = models.CharField(max_length=222, )
-    client = models.CharField(max_length=63, )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

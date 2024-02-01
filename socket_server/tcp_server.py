@@ -11,3 +11,4 @@ class Server(socketserver.ThreadingMixIn, socketserver.TCPServer):
     def start(self):
         server_thread = threading.Thread(target=self.serve_forever)
         server_thread.start()
+        return server_thread

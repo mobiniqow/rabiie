@@ -1,6 +1,5 @@
 from django.db import models
 import uuid
-import requests
 from authenticate.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -133,16 +132,16 @@ class Relay10(BaseRelay):
 
     def get_status(self):
         payload = (
-            f'r1={self.r1}\r\n'
-            f'r2={self.r2}\r\n'
-            f'r3={self.r3}\r\n'
-            f'r4={self.r4}\r\n'
-            f'r5={self.r5}\r\n'
-            f'r6={self.r6}\r\n'
-            f'r7={self.r7}\r\n'
-            f'r8={self.r8}\r\n'
-            f'r9={self.r9}\r\n'
-            f'r10={self.r10}\r\n'
+            f'r1={1 if self.r1 else 0}\r\n'
+            f'r2={1 if self.r2 else 0}\r\n'
+            f'r3={1 if self.r3 else 0}\r\n'
+            f'r4={1 if self.r4 else 0}\r\n'
+            f'r5={1 if self.r5 else 0}\r\n'
+            f'r6={1 if self.r6 else 0}\r\n'
+            f'r7={1 if self.r7 else 0}\r\n'
+            f'r8={1 if self.r8 else 0}\r\n'
+            f'r9={1 if self.r9 else 0}\r\n'
+            f'r10={1 if self.r10 else 0}\r\n'
             f'schedular={1 if self.schedular else 0}\r\n'
         )
         return payload
@@ -152,7 +151,6 @@ class Relay10(BaseRelay):
 def relay10_saved(sender, instance, created, **kwargs):
     # todo instance.get_status ro bayad be client befrestonam
     MessageWareHouse(
-        relay10_id=instance.id,
+        relay10=instance,
         message=instance.get_status(),
-        client=instance.product_id
     ).save()
