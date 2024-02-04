@@ -12,6 +12,7 @@ class Client:
         self.connected = True
         self.product_id = None
         self.device = None
+        self.handler = None
 
     def send_message(self, message):
         self.client.send(message.encode())
@@ -36,7 +37,7 @@ class Client:
             self.device.client_id = self.client_id
             self.product_id = product_id
             self.device.save()
-            self.relay10_handler = Relay10Handler(self.device, self)
+            self.handler = Relay10Handler(self.device, self)
 
     def handle(self):
         while self.connected:
@@ -44,14 +45,15 @@ class Client:
                 message = self.client.recv(1024).decode()
                 if not message:
                     break
-
                 if message.startswith("ID"):
                     self.check_id(message)
+                if message.startswith("Status?"):
+                    self.send_message(self.device.get_status())
                 else:
                     if not self.device:
                         self.disconnect()
 
-                self.relay10_handler.handle_message(message)
+                # self.handler.handle_message(message)
 
             except ConnectionResetError:
                 break
