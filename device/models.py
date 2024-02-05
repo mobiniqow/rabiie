@@ -143,6 +143,7 @@ class Relay10(BaseRelay):
             f'r9={1 if self.r9 else 0}\r\n'
             f'r10={1 if self.r10 else 0}\r\n'
             f'schedular={1 if self.schedular else 0}\r\n'
+            f'date={self.updated_at.strftime("%y-%m-%d:%H:%M")}\r\n'
         )
         return payload
 

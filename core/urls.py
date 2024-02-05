@@ -37,7 +37,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
 
     path('api/', include([
-        path("account/", include("authenticate.urls")),
+        path("accouapint/", include("authenticate.urls")),
         path('room/', include('room.urls')),
         path('device/', include('device.urls')),
         path('user-relation/', include('user_relations.urls')),
