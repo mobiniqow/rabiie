@@ -1,4 +1,4 @@
-#***django starter***
+d#***django starter***
 
 ![](https://img.shields.io/github/stars/pandao/editor.md.svg) ![](https://img.shields.io/github/forks/pandao/editor.md.svg) ![](https://img.shields.io/github/tag/pandao/editor.md.svg) ![](https://img.shields.io/github/release/pandao/editor.md.svg) ![](https://img.shields.io/github/issues/pandao/editor.md.svg) ![](https://img.shields.io/bower/v/editor.md.svg)
  
@@ -25,7 +25,7 @@
 ####docker project 
 
 ``` docker-compose up -d```
-
+    
 ####makemigrations
 
 ```docker-compose exec backend sh -c "python manage.py makemigrations --settings core.settings.dev"```

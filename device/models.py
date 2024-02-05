@@ -105,6 +105,17 @@ class Relay10(BaseRelay):
     r9 = models.BooleanField()
     r10 = models.BooleanField()
 
+    name1 = models.CharField(max_length=39, null=True, blank=True)
+    name2 = models.CharField(max_length=39, null=True, blank=True)
+    name3 = models.CharField(max_length=39, null=True, blank=True)
+    name4 = models.CharField(max_length=39, null=True, blank=True)
+    name5 = models.CharField(max_length=39, null=True, blank=True)
+    name6 = models.CharField(max_length=39, null=True, blank=True)
+    name7 = models.CharField(max_length=39, null=True, blank=True)
+    name8 = models.CharField(max_length=39, null=True, blank=True)
+    name9 = models.CharField(max_length=39, null=True, blank=True)
+    name10 = models.CharField(max_length=39, null=True, blank=True)
+
     device_r1 = models.ForeignKey(Device, on_delete=models.SET_NULL, null=True, blank=True,
                                   related_name='relay10_device_r1')
     device_r2 = models.ForeignKey(Device, on_delete=models.SET_NULL, null=True, blank=True,
@@ -125,10 +136,6 @@ class Relay10(BaseRelay):
                                   related_name='relay10_device_r9')
     device_r10 = models.ForeignKey(Device, on_delete=models.SET_NULL, null=True, blank=True,
                                    related_name='relay10_device_r10')
-    device_r11 = models.ForeignKey(Device, on_delete=models.SET_NULL, null=True, blank=True,
-                                   related_name='relay10_device_r11')
-    device_r12 = models.ForeignKey(Device, on_delete=models.SET_NULL, null=True, blank=True,
-                                   related_name='relay10_device_r12')
 
     def get_status(self):
         payload = (

@@ -1,10 +1,11 @@
 from rest_framework import status, viewsets
 from rest_framework.decorators import api_view
+from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from device.models import Relay10, Relay6
-from device.serializers import Relay10Serializer, Relay6Serializer
+from device.models import Relay10, Relay6, Device
+from device.serializers import Relay10Serializer, Relay6Serializer, DeviceSerializer
 
 
 @api_view(("GET", "PATCH"))
@@ -97,3 +98,8 @@ class DeviceViewSet(APIView):
                 "r12": r12_serializer.data,
                 "r6": r6_serializer.data
             })
+
+
+class KeyDevice(ListAPIView):
+    queryset = Device.objects.all()
+    serializer_class = DeviceSerializer
