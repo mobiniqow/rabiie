@@ -69,6 +69,5 @@ REST_FRAMEWORK = {
         'auth': '7/min',
         'twenty_per_hour': '20/hour',
         'fifty_per_day': '50/day',
-        # 'uploads': '20/day'
     },
 }

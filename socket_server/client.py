@@ -20,10 +20,12 @@ class Client:
     def disconnect(self):
         self.connected = False
         self.client.close()
+        ClientManager.remove_client(self.client_id)
+        
 
     def update(self, data):
-        pass
-        # Implement update logic
+        self.send_message(json.dumps(data))
+
 
     def check_id(self, message):
         product_id = message.split("=")[1]

@@ -154,6 +154,14 @@ class Relay10(BaseRelay):
         )
         return payload
 
+    def get_active_device_by_state_and_name(self):
+        return [{'device': getattr(self, f'device_r{i}'),
+                 'name': getattr(self, f'name{i}'),
+                 'state': getattr(self, f'r{i}')
+                 }
+                for i in range(1, 11) if getattr(self, f'device_r{i}')]
+        # return [getattr(self, f'device_r{i}') for i in range(1, 11) if getattr(self, f'r{i}')]
+
 
 @receiver(post_save, sender=Relay10)
 def relay10_saved(sender, instance, created, **kwargs):

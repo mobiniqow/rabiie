@@ -11,13 +11,13 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
-    "authenticate",
+    "authenticate.apps.AuthenticateConfig",
     "drf_yasg",
-    'room',
-    'device',
-    'user_relations',
-    'protocol',
-    'message_warehouse',
+    'room.apps.RoomConfig',
+    'device.apps.DeviceConfig',
+    'user_relations.apps.UserRelationsConfig',
+    'protocol.apps.ProtocolConfig',
+    'message_warehouse.apps.MessageWarehouseConfig',
 ]
 # DATA_UPLOAD_MAX_MEMORY_SIZE = 524288022
 MIDDLEWARE = [
