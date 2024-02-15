@@ -55,18 +55,18 @@ class Relay10Details(serializers.ModelSerializer):
 
 
 class AddDeviceSerializer(serializers.Serializer):
-    device = serializers.IntegerField()
-    device_id = serializers.IntegerField()
+    port = serializers.IntegerField()
+    device = serializers.UUIDField()
     name = serializers.CharField(max_length=39)
-    product_id = serializers.CharField(max_length=39)
 
     def create(self, validated_data):
-        device = Device.objects.get(id=validated_data['device_id'])
-        if Relay10.objects.filter(product_id=validated_data['product_id']).exist():
-            relay = Relay10.objects.get(product_id=validated_data['product_id'])
+        product_id = self.context.get('product_id')
+        device = Device.objects.get(id=self.data['device'])
+        if Relay10.objects.filter(product_id=product_id).exists():
+            relay = Relay10.objects.get(product_id=product_id)
         else:
-            relay = Relay6.objects.get(product_id=validated_data['product_id'])
-        setattr(relay, f'device_r{validated_data["device"]}', device)
-        setattr(relay, f'name{validated_data["device"]}', validated_data['name'])
+            relay = Relay6.objects.get(product_id=product_id)
+        setattr(relay, f'device_r{self.data["port"]}', device)
+        setattr(relay, f'name{self.data["port"]}', self.data['name'])
         relay.save()
         return relay

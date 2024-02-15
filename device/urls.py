@@ -6,5 +6,5 @@ urlpatterns = [
     path('raw/', KeyDevice.as_view(), name='list'),
     path('<str:product_id>/', search_device, name='search'),
     path('socket/<str:product_id>/', search_device_socket, name='docket'),
-    path('client/<str:client_id>/', client_device, name='client'),
+    path('client/<str:product_id>/', client_device, name='client'),
 ]

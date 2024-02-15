@@ -71,16 +71,16 @@ def search_device_socket(request, product_id):
 
 
 @api_view(("PATCH", "POST"))
-def client_device(request, client_id):
+def client_device(request, product_id):
     if request.method == "PATCH":
-        devices = Relay10.objects.filter(client_id=client_id)
-        print(request.data)
+        devices = Relay10.objects.filter(product_id=product_id)
         if devices.exists():
             serializer = Relay10Serializer(devices.first(), data=request.data, partial=True)
         if not devices.exists():
-            devices = Relay6.objects.filter(client_id=client_id)
+            devices = Relay6.objects.filter(product_id=product_id)
             if devices.exists():
                 serializer = Relay6Serializer(devices.first(), data=request.data, partial=True)
+
         if not devices.exists():
             return Response({"message": "object not found"}, status=status.HTTP_404_NOT_FOUND)
         serializer.is_valid(raise_exception=True)
@@ -88,21 +88,21 @@ def client_device(request, client_id):
         return Response({"message": serializer.data})
 
     if request.method == "POST":
-        devices = Relay10.objects.filter(client_id=client_id)
+        devices = Relay10.objects.filter(product_id=product_id)
         if devices.exists():
             relay = devices.first()
-        if not devices.exists():
-            devices = Relay6.objects.filter(client_id=client_id)
+        else:
+            devices = Relay6.objects.filter(product_id=product_id)
             if devices.exists():
                 relay = devices.first()
         if not devices.exists():
-            return Response({"message": "object not found"}, status=status.HTTP_404_NOT_FOUND)
-
+            return Response({"message": len(Relay10.objects.filter(product_id=product_id)), "id": product_id},
+                            status=status.HTTP_404_NOT_FOUND)
         relay.reset()
         if relay.user != request.user:
             return Response({"message": "invalid user"}, status=status.HTTP_400_BAD_REQUEST)
+        serializer = AddDeviceSerializer(data=request.data, context={'product_id': product_id})
 
-        serializer = AddDeviceSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response({"message": serializer.data})
