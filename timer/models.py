@@ -1,7 +1,7 @@
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from authenticate.models import User
-from device.models import BaseRelay
+from device.models import BaseRelay, Relay10, Relay6
 from django.core.exceptions import ValidationError
 
 
@@ -15,9 +15,19 @@ def day_validator(value):
 
 # شنبه تا جمعه
 class DeviceTimer(models.Model):
+    is_active = models.BooleanField(default=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
-    relay = models.ForeignKey(BaseRelay, on_delete=models.SET_NULL, blank=True, null=True)
+    relay10 = models.ForeignKey(Relay10, on_delete=models.SET_NULL, blank=True, null=True)
+    relay6 = models.ForeignKey(Relay6, on_delete=models.SET_NULL, blank=True, null=True)
     relay_port_number = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(12)])
     start_time = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(24)])
     end_time = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(24)])
     days = models.CharField(max_length=7, validators=[day_validator, ])
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def clean(self):
+        if self.relay10 and self.relay6:
+            raise ValidationError("Only one of relay10 or relay6 can be active.")
+        elif not self.relay10 and not self.relay6:
+            raise ValidationError("Either relay10 or relay6 must be active.")

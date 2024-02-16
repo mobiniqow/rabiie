@@ -30,6 +30,7 @@ class Client:
     def check_id(self, message):
         product_id = message.split("=")[1]
         var = Relay10.objects.filter(product_id=product_id)
+        print(var)
         if not var.exists():
             self.connected = False
             self.disconnect()
@@ -49,7 +50,9 @@ class Client:
                     break
                 if message.startswith("ID"):
                     self.check_id(message)
-                if message.startswith("Status?"):
+                elif message.startswith("Status?"):
+                    self.send_message(self.device.get_status())
+                elif message.startswith("Date?"):
                     self.send_message(self.device.get_status())
                 else:
                     if not self.device:

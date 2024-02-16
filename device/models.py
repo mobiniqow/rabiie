@@ -5,6 +5,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from message_warehouse.models import MessageWareHouse
+from timer.models import DeviceTimer
 
 
 class Device(models.Model):
@@ -48,7 +49,6 @@ class BaseRelay(models.Model):
     state = models.IntegerField(choices=State.choices, default=State.FREE)
     product_id = models.CharField(max_length=22, db_index=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
-    schedular = models.BooleanField(default=False)
 
     def reset(self):
         bool_fields = [field.name for field in self._meta.get_fields() if isinstance(field, models.BooleanField)]
@@ -149,7 +149,6 @@ class Relay10(BaseRelay):
             f'r8={1 if self.r8 else 0}\r\n'
             f'r9={1 if self.r9 else 0}\r\n'
             f'r10={1 if self.r10 else 0}\r\n'
-            f'schedular={1 if self.schedular else 0}\r\n'
             f'date={self.updated_at.strftime("%y-%m-%d:%H:%M")}\r\n'
         )
         return payload
@@ -161,6 +160,18 @@ class Relay10(BaseRelay):
                  }
                 for i in range(1, 11) if getattr(self, f'device_r{i}')]
         # return [getattr(self, f'device_r{i}') for i in range(1, 11) if getattr(self, f'r{i}')]
+
+    def get_schedular_date(self):
+        temp = {'r1': "", 'r2': "", 'r3': "", 'r4': "", 'r5': "", 'r6': "", 'r7': "", 'r8': "", 'r9': "", 'r10': "",
+                'schedular': "", 'date': ""}
+        last_update = None
+        for i in range(1, 11):
+            for active_time in DeviceTimer.objects.filter(relay10=self, is_active=True, relay_port_number=i):
+                last_update = active_time.updated_at if (not last_update
+                                                         and active_time.updated_at > last_update) else last_update
+                temp['r' + str(active_time.relay_port_number)] = active_time.days
+                temp['date'] = active_time.start_time
+        temp['date'] = last_update
 
 
 @receiver(post_save, sender=Relay10)
