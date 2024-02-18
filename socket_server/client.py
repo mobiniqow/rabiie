@@ -58,7 +58,7 @@ class Client:
                     if not self.device:
                         self.disconnect()
 
-                # self.handler.handle_message(message)
+                self.handler.handle_message(message)
 
             except ConnectionResetError:
                 break

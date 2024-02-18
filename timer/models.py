@@ -1,7 +1,6 @@
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from authenticate.models import User
-from device.models import BaseRelay, Relay10, Relay6
 from django.core.exceptions import ValidationError
 
 
@@ -17,8 +16,8 @@ def day_validator(value):
 class DeviceTimer(models.Model):
     is_active = models.BooleanField(default=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
-    relay10 = models.ForeignKey(Relay10, on_delete=models.SET_NULL, blank=True, null=True)
-    relay6 = models.ForeignKey(Relay6, on_delete=models.SET_NULL, blank=True, null=True)
+    relay10 = models.ForeignKey('device.Relay10', on_delete=models.SET_NULL, blank=True, null=True)
+    relay6 = models.ForeignKey('device.Relay6', on_delete=models.SET_NULL, blank=True, null=True)
     relay_port_number = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(12)])
     start_time = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(24)])
     end_time = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(24)])

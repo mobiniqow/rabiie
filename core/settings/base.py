@@ -18,6 +18,7 @@ INSTALLED_APPS = [
     'user_relations.apps.UserRelationsConfig',
     'protocol.apps.ProtocolConfig',
     'message_warehouse.apps.MessageWarehouseConfig',
+    'timer.apps.TimerConfig',
 ]
 # DATA_UPLOAD_MAX_MEMORY_SIZE = 524288022
 MIDDLEWARE = [
