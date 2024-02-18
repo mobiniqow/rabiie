@@ -10,7 +10,6 @@ class Relay10Handler:
         state = message.replace('status_r10=', '')
         ferdosi = Ferdosi()
         js = ferdosi.convert_text_to_json(state)
-        print(js)
         if 'r1' in js:
             print('r1', js['r1'])
             self.device.r1 = bool(js['r1'])
