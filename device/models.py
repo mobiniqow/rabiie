@@ -3,7 +3,7 @@ import uuid
 from authenticate.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
+from message_brokerـproducer.messager import send_broker_message
 from message_warehouse.models import MessageWareHouse
 from timer.models import DeviceTimer
 
@@ -177,6 +177,7 @@ class Relay10(BaseRelay):
 @receiver(post_save, sender=Relay10)
 def relay10_saved(sender, instance, created, **kwargs):
     # todo instance.get_status ro bayad be client befrestonam
+    send_broker_message(message=instance.get_status(), client_id=instance.client_id)
     MessageWareHouse(
         relay10=instance,
         message=instance.get_status(),

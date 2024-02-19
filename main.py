@@ -1,5 +1,7 @@
 import os
 
+from socket_server.message_broker_consumer.message_broker import MessageListenerThread
+
 os.environ['DJANGO_SETTINGS_MODULE'] = 'core.settings.dev'
 import django
 
@@ -13,12 +15,18 @@ def generate_random_number():
     return random.randint(11111, 35000)
 
 
+def start_listening(client_manager):
+    listener_thread = MessageListenerThread('localhost', 'message_broker',client_manager)
+    listener_thread.start()
+
+
 if __name__ == "__main__":
     try:
         HOST = "localhost"
         PORT = generate_random_number()
         client_manager = ClientManager()
         server = Server((HOST, PORT), client_manager)
+        start_listening(client_manager)
         server_thread = server.start()
         print(f"Server listening on {HOST}:{PORT}")
         # while True:
@@ -26,3 +34,6 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         server_thread.join()
         server.shutdown()
+
+# تابع start_listening() را فراخوانی کنید تا ترد راه‌اندازی شود
+

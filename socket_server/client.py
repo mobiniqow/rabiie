@@ -8,6 +8,7 @@ from socket_server.device.Relay10 import Relay10Handler
 class Client:
     def __init__(self, client, client_id):
         self.client = client
+        ClientManager().add_client(client)
         self.client_id = client_id
         self.connected = True
         self.product_id = None
@@ -20,24 +21,21 @@ class Client:
     def disconnect(self):
         self.connected = False
         self.client.close()
-        ClientManager.remove_client(self.client_id)
-        
+        ClientManager().remove_client(self.client_id)
 
     def update(self, data):
         self.send_message(json.dumps(data))
 
-
     def check_id(self, message):
         product_id = message.split("=")[1]
         var = Relay10.objects.filter(product_id=product_id)
-        print(var)
         if not var.exists():
             self.connected = False
             self.disconnect()
             print(f"Device not found with {product_id} for client{self.client_id}")
         else:
             self.device = var[0]
-            self.device.client_id = self.client_id
+            self.device.client_id = f"{self.client_id[0]}:{self.client_id[1]}"
             self.product_id = product_id
             self.device.save()
             self.handler = Relay10Handler(self.device, self)

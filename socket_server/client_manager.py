@@ -19,8 +19,9 @@ class ClientManager:
 
     def add_client(self, client):
         with self.mutex:
-            client.send_message("ID?")
-            self.clients[client.client_id] = client
+
+            client.send(b"ID?")
+            self.clients[client.id] = client
 
     def remove_client(self, client):
         with self.mutex:
@@ -33,6 +34,7 @@ class ClientManager:
     def send_message_to_client_by_id(self, client_id, message):
         with self.mutex:
             client = self.clients.get(client_id)
+            print(f'client {self.clients}')
             if client:
                 client.send_message(message)
 

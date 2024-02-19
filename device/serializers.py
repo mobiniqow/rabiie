@@ -54,6 +54,39 @@ class Relay10Details(serializers.ModelSerializer):
         return response
 
 
+class Relay6Details(serializers.ModelSerializer):
+    class Meta:
+        model = Relay6
+
+    fields = '__all__'
+    read_only_fields = ("id", "product_id", "user")
+
+    def to_representation(self, instance):
+        active_device = []
+        free_device = []
+        for i in range(1, 7):
+            device_attr = getattr(instance, f'device_r{i}', None)
+            if not device_attr:
+                free_device.append(i)
+        for i in range(1, 7):
+            device_attr = getattr(instance, f'device_r{i}', None)
+            if device_attr:
+                device_name = getattr(instance, f'name{i}', '')
+                device_state = getattr(instance, f'r{i}', '')
+                device_representation = {
+                    'device': DeviceSerializer(device_attr).data,
+                    'name': device_name,
+                    'state': device_state
+                }
+                active_device.append(device_representation)
+        response = {
+            'active_device': active_device, 'id': instance.id,
+            'type': 'relay6', 'product_id': instance.product_id,
+            'state': instance.state, 'free_device': free_device,
+        }
+        return response
+
+
 class AddDeviceSerializer(serializers.Serializer):
     port = serializers.IntegerField()
     device = serializers.UUIDField()

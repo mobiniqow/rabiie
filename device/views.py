@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 
 from device.models import Relay10, Relay6, Device
 from device.serializers import Relay10Serializer, Relay6Serializer, DeviceSerializer, Relay10Details, \
-    AddDeviceSerializer
+    AddDeviceSerializer, Relay6Details
 
 
 @api_view(("GET", "PATCH"))
@@ -115,7 +115,7 @@ class DeviceViewSet(APIView):
         r10_devices = Relay10.objects.filter(user=request.user)
         r6_devices = Relay6.objects.filter(user=request.user)
         r10_serializer = Relay10Details(r10_devices, many=True)
-        r6_serializer = Relay6Serializer(r6_devices, many=True)
+        r6_serializer = Relay6Details(r6_devices, many=True)
         return Response(
             {
                 "r12": r10_serializer.data,
