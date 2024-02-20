@@ -16,11 +16,8 @@ class MessageListenerThread(threading.Thread):
     def run(self):
         connection = pika.BlockingConnection(pika.ConnectionParameters(self.host))
         channel = connection.channel()
-
         channel.queue_declare(queue=self.queue_name)
-
         channel.basic_consume(queue=self.queue_name, on_message_callback=self.process_message, auto_ack=True)
-
         print('Listening for messages...')
         channel.start_consuming()
 

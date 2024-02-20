@@ -17,11 +17,13 @@ class ClientManager:
         self.clients_product_id = {}
         self.mutex = threading.RLock()
 
-    def add_client(self, client):
+    def add_client(self, client, client_id):
         with self.mutex:
-
             client.send(b"ID?")
-            self.clients[client.id] = client
+            key_val = f'{client_id[0]}:{client_id[1]}'  # client_id[0] is the ip and client_id[1] is the port
+            self.clients_product_id[key_val] = client
+            print(f'client add {client_id}')
+            self.clients[key_val] = client
 
     def remove_client(self, client):
         with self.mutex:
@@ -34,9 +36,8 @@ class ClientManager:
     def send_message_to_client_by_id(self, client_id, message):
         with self.mutex:
             client = self.clients.get(client_id)
-            print(f'client {self.clients}')
             if client:
-                client.send_message(message)
+                client.send(message.encode())
 
     def get_status(self, client_id):
         with self.mutex:

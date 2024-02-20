@@ -172,6 +172,7 @@ class Relay10(BaseRelay):
                 temp['r' + str(active_time.relay_port_number)] = active_time.days
                 temp['date'] = active_time.start_time
         temp['date'] = last_update
+        print(temp)
 
 
 @receiver(post_save, sender=Relay10)

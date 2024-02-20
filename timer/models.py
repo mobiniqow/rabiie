@@ -12,7 +12,6 @@ def day_validator(value):
             raise ValidationError("روز ها باید انتخاب شده باشه یا نه")
 
 
-# شنبه تا جمعه
 class DeviceTimer(models.Model):
     is_active = models.BooleanField(default=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
