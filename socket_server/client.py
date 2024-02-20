@@ -8,7 +8,7 @@ from socket_server.device.Relay10 import Relay10Handler
 class Client:
     def __init__(self, client, client_id):
         self.client = client
-        ClientManager().add_client(client,client_id)
+        ClientManager().add_client(client, client_id)
         self.client_id = client_id
         self.connected = True
         self.product_id = None
