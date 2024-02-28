@@ -43,7 +43,8 @@ class Relay10Details(serializers.ModelSerializer):
                 device_representation = {
                     'device': DeviceSerializer(device_attr).data,
                     'name': device_name,
-                    'state': device_state
+                    'state': device_state,
+                    'relay_number':i,
                 }
                 active_device.append(device_representation)
         response = {
@@ -76,7 +77,8 @@ class Relay6Details(serializers.ModelSerializer):
                 device_representation = {
                     'device': DeviceSerializer(device_attr).data,
                     'name': device_name,
-                    'state': device_state
+                    'state': device_state,
+                    'relay_number':i,
                 }
                 active_device.append(device_representation)
         response = {

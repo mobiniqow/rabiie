@@ -1,6 +1,6 @@
 import json
 
-from device.models import Relay6, Relay10
+from device.models import Relay10
 from socket_server.client_manager import ClientManager
 from socket_server.device.Relay10 import Relay10Handler
 
