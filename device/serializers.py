@@ -78,7 +78,7 @@ class Relay6Details(serializers.ModelSerializer):
                     'device': DeviceSerializer(device_attr).data,
                     'name': device_name,
                     'state': device_state,
-                    'relay_number':i,
+                    'relay_number': i,
                 }
                 active_device.append(device_representation)
         response = {
