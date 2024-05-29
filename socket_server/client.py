@@ -27,7 +27,7 @@ class Client:
         self.send_message(json.dumps(data))
 
     def check_id(self, message):
-        product_id = message.split("=")[1]
+        product_id = message.split("VV")[1]
         var = Relay10.objects.filter(product_id=product_id)
         if not var.exists():
             self.connected = False
@@ -46,7 +46,7 @@ class Client:
                 message = self.client.recv(1024).decode()
                 if not message:
                     break
-                if message.startswith("ID"):
+                if message.startswith("VV"):
                     self.check_id(message)
                 elif message.startswith("Status?"):
                     self.send_message(self.device.get_status())
