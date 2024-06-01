@@ -3,7 +3,7 @@ import uuid
 from authenticate.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from message_brokerـproducer.messager import send_broker_message
+from message_broker.messager import send_broker_message
 from message_warehouse.models import MessageWareHouse
 from timer.models import DeviceTimer
 
@@ -47,7 +47,7 @@ class BaseRelay(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     client_id = models.CharField(max_length=55, blank=True, null=True)
     state = models.IntegerField(choices=State.choices, default=State.FREE)
-    product_id = models.CharField(max_length=22, db_index=True)
+    device_id = models.CharField(max_length=22, db_index=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
 
     def reset(self):

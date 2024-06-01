@@ -2,8 +2,6 @@ import json
 
 import pika
 import threading
-import django
-django.setup()
 
 
 class MessageListenerThread(threading.Thread):
@@ -14,7 +12,7 @@ class MessageListenerThread(threading.Thread):
         self.queue_name = queue_name
 
     def run(self): 
-        connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+        connection = pika.BlockingConnection(pika.ConnectionParameters(self.host))
         channel = connection.channel()
         channel.queue_declare(queue=self.queue_name)
         channel.basic_consume(queue=self.queue_name, on_message_callback=self.process_message, auto_ack=True)

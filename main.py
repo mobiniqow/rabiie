@@ -1,37 +1,38 @@
+import json
 import os
-
-from socket_server.message_broker_consumer.message_broker import MessageListenerThread
-
-os.environ['DJANGO_SETTINGS_MODULE'] = 'core.settings.dev'
+import pika
 import django
+from message_broker.messager import send_broker_message
+
+os.environ["DJANGO_SETTINGS_MODULE"] = "core.settings.dev"
 
 django.setup()
-import random
-from socket_server.tcp_server import Server
-from socket_server.client_manager import ClientManager
+
+connection = pika.BlockingConnection(pika.ConnectionParameters('localhost', 5672, '/',
+                                                               pika.PlainCredentials('guest', 'guest')))
+channel = connection.channel()
+
+# Declare the queue
+channel.queue_declare(queue='backend_queue')
+channel.exchange_declare(exchange='backend_exchange')
+
+send_broker_message(",asdasd", "salam agha mobin")
 
 
-# def generate_random_number():
-#     return random.randint(11111, 35000)
+def callback(ch, method, properties, body):
+    a=json.loads(body)
+    # print(f"aa {bytearray.fromhex( a['payload'])}")
+    print(f"data  {a}")
+    print(f"payload {bytes(a['payload'], encoding='utf8') }")
+    print(f"type {a['type']}")
+    print(f"deviceId {a['deviceId']}")
+
+    #todo
+    # ch.basic_ack(delivery_tag=method.delivery_tag)
 
 
-def start_listening(client_manager):
-    listener_thread = MessageListenerThread('localhost', 'backend_queue',client_manager)
-    listener_thread.start()
+channel.queue_bind(queue='backend_queue', exchange='backend_exchange', routing_key="backend_routing_key")
+channel.basic_consume(queue='backend_queue', on_message_callback=callback, auto_ack=True)
 
-
-if __name__ == "__main__":
-    try:
-        client_manager = ClientManager()
-        # server = Server((HOST, PORT), client_manager)
-        start_listening(client_manager)
-        # server_thread = server.start()
-        # while True:
-        #     pass
-    except KeyboardInterrupt:
-        pass
-        # server_thread.join()
-        # server.shutdown()
-
-# تابع start_listening() را فراخوانی کنید تا ترد راه‌اندازی شود
-
+print('[*] Waiting for messages. To exit press CTRL+C')
+channel.start_consuming()
