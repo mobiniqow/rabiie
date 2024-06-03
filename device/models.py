@@ -1,9 +1,12 @@
-from django.db import models
 import uuid
-from authenticate.models import User
+
+from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from message_broker.messager import send_broker_message
+
+from authenticate.models import User
+from message_broker.producer.messager import send_broker_message
+from message_broker.utils.data_type import binary_to_hex, string_to_hex
 from message_warehouse.models import MessageWareHouse
 from timer.models import DeviceTimer
 
@@ -11,7 +14,7 @@ from timer.models import DeviceTimer
 class Device(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     name = models.CharField(max_length=23)
-    image = models.ImageField(upload_to='device/image')
+    image = models.ImageField(upload_to="device/image")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -51,12 +54,20 @@ class BaseRelay(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
 
     def reset(self):
-        bool_fields = [field.name for field in self._meta.get_fields() if isinstance(field, models.BooleanField)]
+        bool_fields = [
+            field.name
+            for field in self._meta.get_fields()
+            if isinstance(field, models.BooleanField)
+        ]
         for field_name in bool_fields:
             setattr(self, field_name, False)
 
-        fk_fields = [field.name for field in self._meta.get_fields() if isinstance(field, models.ForeignKey)
-                     and field.name.startswith('device_r')]
+        fk_fields = [
+            field.name
+            for field in self._meta.get_fields()
+            if isinstance(field, models.ForeignKey)
+            and field.name.startswith("device_r")
+        ]
         for field_name in fk_fields:
             setattr(self, field_name, None)
 
@@ -65,12 +76,48 @@ class BaseRelay(models.Model):
 
 
 class Relay6(BaseRelay):
-    t1 = models.ForeignKey(Psychrometer, null=True, blank=True, on_delete=models.SET_NULL, related_name='t1')
-    t2 = models.ForeignKey(Psychrometer, null=True, blank=True, on_delete=models.SET_NULL, related_name='t2')
-    t3 = models.ForeignKey(Psychrometer, null=True, blank=True, on_delete=models.SET_NULL, related_name='t3')
-    t4 = models.ForeignKey(Psychrometer, null=True, blank=True, on_delete=models.SET_NULL, related_name='t4')
-    t5 = models.ForeignKey(Psychrometer, null=True, blank=True, on_delete=models.SET_NULL, related_name='t5')
-    t6 = models.ForeignKey(Psychrometer, null=True, blank=True, on_delete=models.SET_NULL, related_name='t6')
+    t1 = models.ForeignKey(
+        Psychrometer,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="t1",
+    )
+    t2 = models.ForeignKey(
+        Psychrometer,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="t2",
+    )
+    t3 = models.ForeignKey(
+        Psychrometer,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="t3",
+    )
+    t4 = models.ForeignKey(
+        Psychrometer,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="t4",
+    )
+    t5 = models.ForeignKey(
+        Psychrometer,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="t5",
+    )
+    t6 = models.ForeignKey(
+        Psychrometer,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="t6",
+    )
 
     r1 = models.BooleanField()
     r2 = models.BooleanField()
@@ -79,18 +126,48 @@ class Relay6(BaseRelay):
     r5 = models.BooleanField()
     r6 = models.BooleanField()
 
-    device_r1 = models.ForeignKey(Device, on_delete=models.SET_NULL, null=True, blank=True,
-                                  related_name='relay6_device_r1')
-    device_r2 = models.ForeignKey(Device, on_delete=models.SET_NULL, null=True, blank=True,
-                                  related_name='relay6_device_r2')
-    device_r3 = models.ForeignKey(Device, on_delete=models.SET_NULL, null=True, blank=True,
-                                  related_name='relay6_device_r3')
-    device_r4 = models.ForeignKey(Device, on_delete=models.SET_NULL, null=True, blank=True,
-                                  related_name='relay6_device_r4')
-    device_r5 = models.ForeignKey(Device, on_delete=models.SET_NULL, null=True, blank=True,
-                                  related_name='relay6_device_r5')
-    device_r6 = models.ForeignKey(Device, on_delete=models.SET_NULL, null=True, blank=True,
-                                  related_name='relay6_device_r6')
+    device_r1 = models.ForeignKey(
+        Device,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="relay6_device_r1",
+    )
+    device_r2 = models.ForeignKey(
+        Device,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="relay6_device_r2",
+    )
+    device_r3 = models.ForeignKey(
+        Device,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="relay6_device_r3",
+    )
+    device_r4 = models.ForeignKey(
+        Device,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="relay6_device_r4",
+    )
+    device_r5 = models.ForeignKey(
+        Device,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="relay6_device_r5",
+    )
+    device_r6 = models.ForeignKey(
+        Device,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="relay6_device_r6",
+    )
 
 
 class Relay10(BaseRelay):
@@ -116,68 +193,144 @@ class Relay10(BaseRelay):
     name9 = models.CharField(max_length=39, null=True, blank=True)
     name10 = models.CharField(max_length=39, null=True, blank=True)
 
-    device_r1 = models.ForeignKey(Device, on_delete=models.SET_NULL, null=True, blank=True,
-                                  related_name='relay10_device_r1')
-    device_r2 = models.ForeignKey(Device, on_delete=models.SET_NULL, null=True, blank=True,
-                                  related_name='relay10_device_r2')
-    device_r3 = models.ForeignKey(Device, on_delete=models.SET_NULL, null=True, blank=True,
-                                  related_name='relay10_device_r3')
-    device_r4 = models.ForeignKey(Device, on_delete=models.SET_NULL, null=True, blank=True,
-                                  related_name='relay10_device_r4')
-    device_r5 = models.ForeignKey(Device, on_delete=models.SET_NULL, null=True, blank=True,
-                                  related_name='relay10_device_r5')
-    device_r6 = models.ForeignKey(Device, on_delete=models.SET_NULL, null=True, blank=True,
-                                  related_name='relay10_device_r6')
-    device_r7 = models.ForeignKey(Device, on_delete=models.SET_NULL, null=True, blank=True,
-                                  related_name='relay10_device_r7')
-    device_r8 = models.ForeignKey(Device, on_delete=models.SET_NULL, null=True, blank=True,
-                                  related_name='relay10_device_r8')
-    device_r9 = models.ForeignKey(Device, on_delete=models.SET_NULL, null=True, blank=True,
-                                  related_name='relay10_device_r9')
-    device_r10 = models.ForeignKey(Device, on_delete=models.SET_NULL, null=True, blank=True,
-                                   related_name='relay10_device_r10')
+    device_r1 = models.ForeignKey(
+        Device,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="relay10_device_r1",
+    )
+    device_r2 = models.ForeignKey(
+        Device,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="relay10_device_r2",
+    )
+    device_r3 = models.ForeignKey(
+        Device,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="relay10_device_r3",
+    )
+    device_r4 = models.ForeignKey(
+        Device,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="relay10_device_r4",
+    )
+    device_r5 = models.ForeignKey(
+        Device,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="relay10_device_r5",
+    )
+    device_r6 = models.ForeignKey(
+        Device,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="relay10_device_r6",
+    )
+    device_r7 = models.ForeignKey(
+        Device,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="relay10_device_r7",
+    )
+    device_r8 = models.ForeignKey(
+        Device,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="relay10_device_r8",
+    )
+    device_r9 = models.ForeignKey(
+        Device,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="relay10_device_r9",
+    )
+    device_r10 = models.ForeignKey(
+        Device,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="relay10_device_r10",
+    )
 
     def get_status(self):
         payload = (
-            f'r1={1 if self.r1 else 0}\r\n'
-            f'r2={1 if self.r2 else 0}\r\n'
-            f'r3={1 if self.r3 else 0}\r\n'
-            f'r4={1 if self.r4 else 0}\r\n'
-            f'r5={1 if self.r5 else 0}\r\n'
-            f'r6={1 if self.r6 else 0}\r\n'
-            f'r7={1 if self.r7 else 0}\r\n'
-            f'r8={1 if self.r8 else 0}\r\n'
-            f'r9={1 if self.r9 else 0}\r\n'
-            f'r10={1 if self.r10 else 0}\r\n'
-            f'date={self.updated_at.strftime("%y-%m-%d:%H:%M")}\r\n'
+            f"{1 if self.r1 else 0}"
+            f"{1 if self.r2 else 0}"
+            f"{1 if self.r3 else 0}"
+            f"{1 if self.r4 else 0}"
+            f"{1 if self.r5 else 0}"
+            f"{1 if self.r6 else 0}"
+            f"{1 if self.r7 else 0}"
+            f"{1 if self.r8 else 0}"
+            f"{1 if self.r9 else 0}"
+            f"{1 if self.r10 else 0}"
         )
-        return payload
+        time = f'{self.updated_at.strftime("%y:%m:%d:%H:%M:%S")}'
+
+        payload_hex = binary_to_hex(payload)
+        time_hex = string_to_hex(time)
+
+        return payload_hex + time_hex
 
     def get_active_device_by_state_and_name(self):
-        return [{'device': getattr(self, f'device_r{i}'),
-                 'name': getattr(self, f'name{i}'),
-                 'state': getattr(self, f'r{i}')
-                 }
-                for i in range(1, 11) if getattr(self, f'device_r{i}')]
+        return [
+            {
+                "device": getattr(self, f"device_r{i}"),
+                "name": getattr(self, f"name{i}"),
+                "state": getattr(self, f"r{i}"),
+            }
+            for i in range(1, 11)
+            if getattr(self, f"device_r{i}")
+        ]
         # return [getattr(self, f'device_r{i}') for i in range(1, 11) if getattr(self, f'r{i}')]
 
     def get_schedular_date(self):
-        temp = {'r1': "", 'r2': "", 'r3': "", 'r4': "", 'r5': "", 'r6': "", 'r7': "", 'r8': "", 'r9': "", 'r10': "",
-                'schedular': "", 'date': ""}
+        temp = {
+            "r1": "",
+            "r2": "",
+            "r3": "",
+            "r4": "",
+            "r5": "",
+            "r6": "",
+            "r7": "",
+            "r8": "",
+            "r9": "",
+            "r10": "",
+            "schedular": "",
+            "date": "",
+        }
         last_update = None
         for i in range(1, 11):
-            for active_time in DeviceTimer.objects.filter(relay10=self, is_active=True, relay_port_number=i):
-                last_update = active_time.updated_at if (not last_update
-                                                         and active_time.updated_at > last_update) else last_update
-                temp['r' + str(active_time.relay_port_number)] = active_time.days
-                temp['date'] = active_time.start_time
-        temp['date'] = last_update
+            for active_time in DeviceTimer.objects.filter(
+                relay10=self, is_active=True, relay_port_number=i
+            ):
+                last_update = (
+                    active_time.updated_at
+                    if (not last_update and active_time.updated_at > last_update)
+                    else last_update
+                )
+                temp["r" + str(active_time.relay_port_number)] = active_time.days
+                temp["date"] = active_time.start_time
+        temp["date"] = last_update
         print(temp)
 
 
 @receiver(post_save, sender=Relay10)
 def relay10_saved(sender, instance, created, **kwargs):
     # todo instance.get_status ro bayad be client befrestonam
+    # todo message ro dorost konam
     send_broker_message(message=instance.get_status(), client_id=instance.client_id)
     MessageWareHouse(
         relay10=instance,

@@ -13,12 +13,12 @@ INSTALLED_APPS = [
     "rest_framework",
     "authenticate.apps.AuthenticateConfig",
     "drf_yasg",
-    'room.apps.RoomConfig',
-    'device.apps.DeviceConfig',
-    'user_relations.apps.UserRelationsConfig',
-    'protocol.apps.ProtocolConfig',
-    'message_warehouse.apps.MessageWarehouseConfig',
-    'timer.apps.TimerConfig',
+    "room.apps.RoomConfig",
+    "device.apps.DeviceConfig",
+    "user_relations.apps.UserRelationsConfig",
+    "protocol.apps.ProtocolConfig",
+    "message_warehouse.apps.MessageWarehouseConfig",
+    "timer.apps.TimerConfig",
 ]
 # DATA_UPLOAD_MAX_MEMORY_SIZE = 524288022
 MIDDLEWARE = [
@@ -29,7 +29,6 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-
 ]
 APPEND_SLASH = False
 ROOT_URLCONF = "core.urls"

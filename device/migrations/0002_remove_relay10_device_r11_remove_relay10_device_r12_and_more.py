@@ -6,66 +6,66 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('device', '0001_initial'),
+        ("device", "0001_initial"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='relay10',
-            name='device_r11',
+            model_name="relay10",
+            name="device_r11",
         ),
         migrations.RemoveField(
-            model_name='relay10',
-            name='device_r12',
+            model_name="relay10",
+            name="device_r12",
         ),
         migrations.AddField(
-            model_name='relay10',
-            name='name1',
+            model_name="relay10",
+            name="name1",
             field=models.CharField(blank=True, max_length=39, null=True),
         ),
         migrations.AddField(
-            model_name='relay10',
-            name='name10',
+            model_name="relay10",
+            name="name10",
             field=models.CharField(blank=True, max_length=39, null=True),
         ),
         migrations.AddField(
-            model_name='relay10',
-            name='name2',
+            model_name="relay10",
+            name="name2",
             field=models.CharField(blank=True, max_length=39, null=True),
         ),
         migrations.AddField(
-            model_name='relay10',
-            name='name3',
+            model_name="relay10",
+            name="name3",
             field=models.CharField(blank=True, max_length=39, null=True),
         ),
         migrations.AddField(
-            model_name='relay10',
-            name='name4',
+            model_name="relay10",
+            name="name4",
             field=models.CharField(blank=True, max_length=39, null=True),
         ),
         migrations.AddField(
-            model_name='relay10',
-            name='name5',
+            model_name="relay10",
+            name="name5",
             field=models.CharField(blank=True, max_length=39, null=True),
         ),
         migrations.AddField(
-            model_name='relay10',
-            name='name6',
+            model_name="relay10",
+            name="name6",
             field=models.CharField(blank=True, max_length=39, null=True),
         ),
         migrations.AddField(
-            model_name='relay10',
-            name='name7',
+            model_name="relay10",
+            name="name7",
             field=models.CharField(blank=True, max_length=39, null=True),
         ),
         migrations.AddField(
-            model_name='relay10',
-            name='name8',
+            model_name="relay10",
+            name="name8",
             field=models.CharField(blank=True, max_length=39, null=True),
         ),
         migrations.AddField(
-            model_name='relay10',
-            name='name9',
+            model_name="relay10",
+            name="name9",
             field=models.CharField(blank=True, max_length=39, null=True),
         ),
     ]

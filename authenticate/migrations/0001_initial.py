@@ -8,30 +8,93 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('auth', '0012_alter_user_first_name_max_length'),
+        ("auth", "0012_alter_user_first_name_max_length"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='User',
+            name="User",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('password', models.CharField(max_length=128, verbose_name='password')),
-                ('last_login', models.DateTimeField(blank=True, null=True, verbose_name='last login')),
-                ('is_superuser', models.BooleanField(default=False, help_text='Designates that this user has all permissions without explicitly assigning them.', verbose_name='superuser status')),
-                ('phone', models.CharField(max_length=15, unique=True, verbose_name='شماره تلفن')),
-                ('first_name', models.CharField(max_length=50, verbose_name='نام')),
-                ('last_name', models.CharField(max_length=50, verbose_name='نام خانوادگی')),
-                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='تاریخ ایجاد')),
-                ('updated_at', models.DateTimeField(auto_now=True, verbose_name='تاریخ به\u200cروزرسانی')),
-                ('role', models.IntegerField(choices=[(1, 'User'), (5, 'Admin')], default=1, verbose_name='نقش')),
-                ('is_staff', models.BooleanField(default=False, verbose_name='کارمند')),
-                ('is_active', models.BooleanField(default=False, verbose_name='فعال')),
-                ('groups', models.ManyToManyField(blank=True, help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.', related_name='user_set', related_query_name='user', to='auth.group', verbose_name='groups')),
-                ('user_permissions', models.ManyToManyField(blank=True, help_text='Specific permissions for this user.', related_name='user_set', related_query_name='user', to='auth.permission', verbose_name='user permissions')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("password", models.CharField(max_length=128, verbose_name="password")),
+                (
+                    "last_login",
+                    models.DateTimeField(
+                        blank=True, null=True, verbose_name="last login"
+                    ),
+                ),
+                (
+                    "is_superuser",
+                    models.BooleanField(
+                        default=False,
+                        help_text="Designates that this user has all permissions without explicitly assigning them.",
+                        verbose_name="superuser status",
+                    ),
+                ),
+                (
+                    "phone",
+                    models.CharField(
+                        max_length=15, unique=True, verbose_name="شماره تلفن"
+                    ),
+                ),
+                ("first_name", models.CharField(max_length=50, verbose_name="نام")),
+                (
+                    "last_name",
+                    models.CharField(max_length=50, verbose_name="نام خانوادگی"),
+                ),
+                (
+                    "created_at",
+                    models.DateTimeField(auto_now_add=True, verbose_name="تاریخ ایجاد"),
+                ),
+                (
+                    "updated_at",
+                    models.DateTimeField(
+                        auto_now=True, verbose_name="تاریخ به\u200cروزرسانی"
+                    ),
+                ),
+                (
+                    "role",
+                    models.IntegerField(
+                        choices=[(1, "User"), (5, "Admin")],
+                        default=1,
+                        verbose_name="نقش",
+                    ),
+                ),
+                ("is_staff", models.BooleanField(default=False, verbose_name="کارمند")),
+                ("is_active", models.BooleanField(default=False, verbose_name="فعال")),
+                (
+                    "groups",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="The groups this user belongs to. A user will get all permissions granted to each of their groups.",
+                        related_name="user_set",
+                        related_query_name="user",
+                        to="auth.group",
+                        verbose_name="groups",
+                    ),
+                ),
+                (
+                    "user_permissions",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="Specific permissions for this user.",
+                        related_name="user_set",
+                        related_query_name="user",
+                        to="auth.permission",
+                        verbose_name="user permissions",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
     ]

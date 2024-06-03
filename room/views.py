@@ -27,8 +27,10 @@ class RoomDeviceView(APIView):
     def post(self, request, room_id):
         var = {}
         var.update(request.data)
-        var['room'] = room_id
-        serializer = RoomDeviceSerializer(data=var, )
+        var["room"] = room_id
+        serializer = RoomDeviceSerializer(
+            data=var,
+        )
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)

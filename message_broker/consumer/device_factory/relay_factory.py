@@ -2,7 +2,7 @@ import os
 
 import django
 
-os.environ['DJANGO_MODULE_SETTINGS'] = "core.settings.prod"
+os.environ["DJANGO_MODULE_SETTINGS"] = "core.settings.prod"
 django.setup()
 
 from device.models import Relay10, Relay6
@@ -12,11 +12,11 @@ RELAY_TEN = "RELAY10"
 
 
 def get_device_by_id(device_id):
-    relay = Relay6.objects.get(device_id=device_id)
-    if relay is not None:
-        return relay, RELAY_SIX
+    relay = Relay6.objects.filter(device_id=device_id)
+    if relay.exists():
+        return relay.first(), RELAY_SIX, 6
     else:
-        relay = Relay10.objects.get(device_id=device_id)
-        if relay is not None:
-            return relay, RELAY_TEN
+        relay = Relay10.objects.filter(device_id=device_id)
+        if relay.exists():
+            return relay.first(), RELAY_TEN,  10
     return None, None

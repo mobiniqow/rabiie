@@ -69,3 +69,4 @@ wrapt==1.14.1
 gunicorn
 pika
 pillow
+black

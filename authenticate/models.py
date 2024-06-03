@@ -10,7 +10,7 @@ class UserManager(BaseUserManager):
         Create and save a User with the given phone and password.
         """
         if not phone:
-            raise ValueError(_('The Phone Number field must be set'))
+            raise ValueError(_("The Phone Number field must be set"))
         user = self.model(phone=phone, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
@@ -36,10 +36,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="تاریخ ایجاد")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="تاریخ به‌روزرسانی")
     objects = UserManager()
-    role = models.IntegerField(choices=Role.choices, default=Role.USER, verbose_name="نقش")
+    role = models.IntegerField(
+        choices=Role.choices, default=Role.USER, verbose_name="نقش"
+    )
     is_staff = models.BooleanField(default=False, verbose_name="کارمند")
     is_active = models.BooleanField(default=False, verbose_name="فعال")
-    USERNAME_FIELD = 'phone'
+    USERNAME_FIELD = "phone"
 
     def __str__(self):
         return self.phone

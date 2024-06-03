@@ -20,9 +20,9 @@ class ClientManager:
     def add_client(self, client, client_id):
         with self.mutex:
             client.send(b"ID?")
-            key_val = f'{client_id[0]}:{client_id[1]}'  # client_id[0] is the ip and client_id[1] is the port
+            key_val = f"{client_id[0]}:{client_id[1]}"  # client_id[0] is the ip and client_id[1] is the port
             self.clients_product_id[key_val] = client
-            print(f'client add {client_id}')
+            print(f"client add {client_id}")
             self.clients[key_val] = client
 
     def remove_client(self, client):

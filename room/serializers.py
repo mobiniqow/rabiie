@@ -7,7 +7,7 @@ class RoomSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Room
-        fields = '__all__'
+        fields = "__all__"
 
     def get_axe(self, obj: Room):
         try:
@@ -16,13 +16,13 @@ class RoomSerializer(serializers.ModelSerializer):
             return ""
 
     def create(self, validated_data):
-        user = self.context.get('request').user
-        validated_data['user'] = user
+        user = self.context.get("request").user
+        validated_data["user"] = user
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
-        user = self.context.get('request').user
-        validated_data['user'] = user
+        user = self.context.get("request").user
+        validated_data["user"] = user
         return super().update(instance, validated_data)
 
 

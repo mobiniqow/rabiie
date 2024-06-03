@@ -6,11 +6,10 @@ from .models import EVENT
 
 
 class EventSocket(APIView):
-
     def post(self, request):
-        address = request.data.get('address')
-        port = request.data.get('port')
-        message = request.data.get('message')
+        address = request.data.get("address")
+        port = request.data.get("port")
+        message = request.data.get("message")
         EVENT()
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -19,4 +18,7 @@ class EventSocket(APIView):
             sock.close()
             return Response("Message sent successfully!", status=status.HTTP_200_OK)
         except Exception as e:
-            return Response(f"Error occurred: {str(e)}", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                f"Error occurred: {str(e)}",
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )

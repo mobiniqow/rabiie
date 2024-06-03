@@ -5,35 +5,48 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from device.models import Relay10, Relay6, Device
-from device.serializers import Relay10Serializer, Relay6Serializer, DeviceSerializer, Relay10Details, \
-    AddDeviceSerializer, Relay6Details
+from device.serializers import (
+    Relay10Serializer,
+    Relay6Serializer,
+    DeviceSerializer,
+    Relay10Details,
+    AddDeviceSerializer,
+    Relay6Details,
+)
 
 
 @api_view(("GET", "PATCH"))
 def search_device(request, device_id):
-    if request.method == 'GET':
+    if request.method == "GET":
         devices = Relay10.objects.filter(device_id=device_id)
         if not devices.exists():
             devices = Relay6.objects.filter(device_id=device_id)
         if not devices.exists():
-            return Response({"message": "device not found"},
-                            status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"message": "device not found"}, status=status.HTTP_404_NOT_FOUND
+            )
         device = devices.first()
         device.reset()
         device.user = request.user
         device.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    if request.method == 'PATCH':
+    if request.method == "PATCH":
         devices = Relay10.objects.filter(device_id=device_id, user=request.user)
         if devices.exists():
-            serializer = Relay10Serializer(devices.first(), data=request.data, partial=True)
+            serializer = Relay10Serializer(
+                devices.first(), data=request.data, partial=True
+            )
         if not devices.exists():
             devices = Relay6.objects.filter(device_id=device_id, user=request.user)
             if devices.exists():
-                serializer = Relay6Serializer(devices.first(), data=request.data, partial=True)
+                serializer = Relay6Serializer(
+                    devices.first(), data=request.data, partial=True
+                )
         if not devices.exists():
-            return Response({"message": "object not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"message": "object not found"}, status=status.HTTP_404_NOT_FOUND
+            )
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({"message": serializer.data})
@@ -41,29 +54,36 @@ def search_device(request, device_id):
 
 @api_view(("PATCH", "GET"))
 def search_device_socket(request, device_id):
-    if request.method == 'GET':
+    if request.method == "GET":
         devices = Relay10.objects.filter(device_id=device_id)
         if not devices.exists():
             devices = Relay6.objects.filter(device_id=device_id)
         if not devices.exists():
-            return Response({"message": "device not found"},
-                            status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"message": "device not found"}, status=status.HTTP_404_NOT_FOUND
+            )
         device = devices.first()
         device.reset()
         device.user = request.user
         device.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    if request.method == 'PATCH':
+    if request.method == "PATCH":
         devices = Relay10.objects.filter(device_id=device_id)
         if devices.exists():
-            serializer = Relay10Serializer(devices.first(), data=request.data, partial=True)
+            serializer = Relay10Serializer(
+                devices.first(), data=request.data, partial=True
+            )
         if not devices.exists():
             devices = Relay6.objects.filter(device_id=device_id)
             if devices.exists():
-                serializer = Relay6Serializer(devices.first(), data=request.data, partial=True)
+                serializer = Relay6Serializer(
+                    devices.first(), data=request.data, partial=True
+                )
         if not devices.exists():
-            return Response({"message": "object not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"message": "object not found"}, status=status.HTTP_404_NOT_FOUND
+            )
         serializer.is_valid(raise_exception=True)
         serializer.save()
         print(serializer.data)
@@ -75,14 +95,20 @@ def client_device(request, device_id):
     if request.method == "PATCH":
         devices = Relay10.objects.filter(device_id=device_id)
         if devices.exists():
-            serializer = Relay10Serializer(devices.first(), data=request.data, partial=True)
+            serializer = Relay10Serializer(
+                devices.first(), data=request.data, partial=True
+            )
         if not devices.exists():
             devices = Relay6.objects.filter(device_id=device_id)
             if devices.exists():
-                serializer = Relay6Serializer(devices.first(), data=request.data, partial=True)
+                serializer = Relay6Serializer(
+                    devices.first(), data=request.data, partial=True
+                )
 
         if not devices.exists():
-            return Response({"message": "object not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"message": "object not found"}, status=status.HTTP_404_NOT_FOUND
+            )
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({"message": serializer.data})
@@ -96,12 +122,21 @@ def client_device(request, device_id):
             if devices.exists():
                 relay = devices.first()
         if not devices.exists():
-            return Response({"message": len(Relay10.objects.filter(device_id=device_id)), "id": device_id},
-                            status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {
+                    "message": len(Relay10.objects.filter(device_id=device_id)),
+                    "id": device_id,
+                },
+                status=status.HTTP_404_NOT_FOUND,
+            )
         relay.reset()
         if relay.user != request.user:
-            return Response({"message": "invalid user"}, status=status.HTTP_400_BAD_REQUEST)
-        serializer = AddDeviceSerializer(data=request.data, context={'device_id': device_id})
+            return Response(
+                {"message": "invalid user"}, status=status.HTTP_400_BAD_REQUEST
+            )
+        serializer = AddDeviceSerializer(
+            data=request.data, context={"device_id": device_id}
+        )
 
         if serializer.is_valid():
             serializer.save()
@@ -111,16 +146,15 @@ def client_device(request, device_id):
 
 
 class DeviceViewSet(APIView):
-    def get(self, request, ):
+    def get(
+        self,
+        request,
+    ):
         r10_devices = Relay10.objects.filter(user=request.user)
         r6_devices = Relay6.objects.filter(user=request.user)
         r10_serializer = Relay10Details(r10_devices, many=True)
         r6_serializer = Relay6Details(r6_devices, many=True)
-        return Response(
-            {
-                "r12": r10_serializer.data,
-                "r6": r6_serializer.data
-            })
+        return Response({"r12": r10_serializer.data, "r6": r6_serializer.data})
 
 
 class KeyDevice(ListAPIView):

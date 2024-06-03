@@ -9,21 +9,53 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('device', '0001_initial'),
+        ("device", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='MessageWareHouse',
+            name="MessageWareHouse",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('status', models.IntegerField(choices=[(1, 'Suspend'), (2, 'Successfully'), (3, 'Try')], default=1)),
-                ('message', models.CharField(max_length=222)),
-                ('client', models.CharField(max_length=63)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('relay10', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='relay_10', to='device.relay10')),
-                ('relay6', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='relay_6', to='device.relay6')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "status",
+                    models.IntegerField(
+                        choices=[(1, "Suspend"), (2, "Successfully"), (3, "Try")],
+                        default=1,
+                    ),
+                ),
+                ("message", models.CharField(max_length=222)),
+                ("client", models.CharField(max_length=63)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "relay10",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="relay_10",
+                        to="device.relay10",
+                    ),
+                ),
+                (
+                    "relay6",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="relay_6",
+                        to="device.relay6",
+                    ),
+                ),
             ],
         ),
     ]

@@ -4,4 +4,4 @@ from .models import MessageWareHouse
 
 @admin.register(MessageWareHouse)
 class MessageWareHouseAdmin(admin.ModelAdmin):
-    list_display = ("id", "message", 'state')
+    list_display = ("id", "message", "state")

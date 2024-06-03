@@ -35,13 +35,17 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-
-    path('api/', include([
-        path("account/", include("authenticate.urls")),
-        path('room/', include('room.urls')),
-        path('device/', include('device.urls')),
-        path('user-relation/', include('user_relations.urls')),
-    ])),
+    path(
+        "api/",
+        include(
+            [
+                path("account/", include("authenticate.urls")),
+                path("room/", include("room.urls")),
+                path("device/", include("device.urls")),
+                path("user-relation/", include("user_relations.urls")),
+            ]
+        ),
+    ),
     path("swagger.json", schema_view.without_ui(cache_timeout=0), name="schema-json"),
     path(
         "swagger/",
