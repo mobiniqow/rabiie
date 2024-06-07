@@ -6,8 +6,7 @@
       <paths name="rabiie (project level)">
         <serverdata>
           <mappings>
-            <mapping deploy="/home/ubuntu/rabiie" local="$PROJECT_DIR$" web="/" />
-            <mapping local="$PROJECT_DIR$" />
+            <mapping deploy="/home/ubuntu/rabbie/backend" local="$PROJECT_DIR$" />
           </mappings>
         </serverdata>
       </paths>
