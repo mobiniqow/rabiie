@@ -1,3 +1,6 @@
+from message_broker.consumer.strategy.models.get_server_time import ServerTimeStrategy
+from message_broker.consumer.strategy.models.last_state import LastStateStrategy
+from message_broker.consumer.strategy.models.schedule import ScheduleStrategy
 from message_broker.consumer.strategy.models.settings import SettingsStrategy
 from message_broker.gateway.gateway import GateWay
 from message_broker.gateway.gateway_abs import GatewayAbs
@@ -6,8 +9,12 @@ from message_broker.message_broker.rabbit_mq.consumer.callback.backend_callback 
 from message_broker.message_broker.rabbit_mq.rabbit_mq import RabbitMq
 
 if __name__ == '__main__':
+    # gateway: GateWay = GateWay()
     gateway: GatewayAbs = GateWay()
     gateway.add_strategy(SettingsStrategy())
+    gateway.add_strategy(ServerTimeStrategy())
+    gateway.add_strategy(LastStateStrategy())
+    gateway.add_strategy(ScheduleStrategy())
     rabbit = RabbitMq("localhost", 5672, "guest", "guest", "/")
     channel = rabbit.get_channel()
     observer = BackendCallBack(gateway)

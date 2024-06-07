@@ -1,5 +1,4 @@
 import json
-from datetime import datetime
 
 import pika
 
@@ -7,7 +6,7 @@ from message_broker.message.message import Message
 
 
 def serialize_object(obj):
-    return json.dumps(obj)
+    return json.loads(json.dumps(obj))
 
 
 def send_broker_message(
@@ -21,11 +20,12 @@ def send_broker_message(
         "type": message.type,
         "payload": message.payload,
         "device_id": message.device_id,
+        "datetime": message.datetime
     }
     channel.basic_publish(
         exchange="socket_server_exchange",
         routing_key="socket_server_routing_key",
-        body=serialize_object(data),
+        body=str(data),
     )
-    print("[x] Sent 'Hello World!'")
+    print(f"[x] Sent to device_id {message.device_id}")
     connection.close()

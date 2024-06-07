@@ -1,13 +1,8 @@
 import uuid
 
 from django.db import models
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 
 from authenticate.models import User
-from message_broker.producer.messager import send_broker_message
-from message_broker.utils.data_type import binary_to_hex, string_to_hex
-from message_warehouse.models import MessageWareHouse
 from timer.models import DeviceTimer
 
 
@@ -50,7 +45,8 @@ class BaseRelay(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     client_id = models.CharField(max_length=55, blank=True, null=True)
     state = models.IntegerField(choices=State.choices, default=State.FREE)
-    device_id = models.CharField(max_length=22, db_index=True)
+    # device_id len
+    device_id = models.CharField(max_length=11, db_index=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
 
     def reset(self):
@@ -264,7 +260,7 @@ class Relay10(BaseRelay):
         related_name="relay10_device_r10",
     )
 
-    def get_status(self):
+    def get_payload(self):
         payload = (
             f"{1 if self.r1 else 0}"
             f"{1 if self.r2 else 0}"
@@ -277,12 +273,31 @@ class Relay10(BaseRelay):
             f"{1 if self.r9 else 0}"
             f"{1 if self.r10 else 0}"
         )
-        time = f'{self.updated_at.strftime("%y:%m:%d:%H:%M:%S")}'
+        return payload
 
-        payload_hex = binary_to_hex(payload)
-        time_hex = string_to_hex(time)
+    def get_time(self):
+        time = f'{self.updated_at.strftime("%Y:%m:%d:%H:%M:%S")}'
+        return time
 
-        return payload_hex + time_hex
+    # def get_status(self):
+    #     payload = (
+    #         f"{1 if self.r1 else 0}"
+    #         f"{1 if self.r2 else 0}"
+    #         f"{1 if self.r3 else 0}"
+    #         f"{1 if self.r4 else 0}"
+    #         f"{1 if self.r5 else 0}"
+    #         f"{1 if self.r6 else 0}"
+    #         f"{1 if self.r7 else 0}"
+    #         f"{1 if self.r8 else 0}"
+    #         f"{1 if self.r9 else 0}"
+    #         f"{1 if self.r10 else 0}"
+    #     )
+    #     time = f'{self.updated_at.strftime("%Y:%m:%d:%H:%M:%S")}'
+    #     print(f"time{time}")
+    #     payload_hex = binary_to_hex(payload)
+    #     time_hex = string_to_hex(time)
+    #
+    #     return payload + time
 
     def get_active_device_by_state_and_name(self):
         return [
@@ -296,43 +311,37 @@ class Relay10(BaseRelay):
         ]
         # return [getattr(self, f'device_r{i}') for i in range(1, 11) if getattr(self, f'r{i}')]
 
-    def get_schedular_date(self):
-        temp = {
-            "r1": "",
-            "r2": "",
-            "r3": "",
-            "r4": "",
-            "r5": "",
-            "r6": "",
-            "r7": "",
-            "r8": "",
-            "r9": "",
-            "r10": "",
-            "schedular": "",
-            "date": "",
-        }
-        last_update = None
-        for i in range(1, 11):
-            for active_time in DeviceTimer.objects.filter(
-                relay10=self, is_active=True, relay_port_number=i
-            ):
-                last_update = (
-                    active_time.updated_at
-                    if (not last_update and active_time.updated_at > last_update)
-                    else last_update
-                )
-                temp["r" + str(active_time.relay_port_number)] = active_time.days
-                temp["date"] = active_time.start_time
-        temp["date"] = last_update
-        print(temp)
+    def get_schedular_date(self, relay_number):
+        WEEK_DAY_NUMBER = 7
+        DAY_HOUR_NUMBER = 24
+        OFF_CHAR = '0'
+        ON_CHAR = '1'
+        result = ""
+        device_timer = DeviceTimer.objects.filter(relay10=self, is_active=True, relay_port_number=relay_number, )
+        if device_timer.exists():
+            device_timer: DeviceTimer = device_timer.first()
+            for i in range(WEEK_DAY_NUMBER):
+                if device_timer.days[i] == ON_CHAR:
+                    temp = DAY_HOUR_NUMBER * OFF_CHAR
+                    # yek ghesmat ro ON_CHAR mikone
+                    temp = temp[:device_timer.start_time] + len(temp[device_timer.start_time:device_timer.end_time+1]) * ON_CHAR + temp[device_timer.end_time+1:]
+                else:
+                    temp = DAY_HOUR_NUMBER * OFF_CHAR
+                result += temp
+        else:
+            result = WEEK_DAY_NUMBER * DAY_HOUR_NUMBER * OFF_CHAR
+        print(f'result {result}')
+        return result
 
-
-@receiver(post_save, sender=Relay10)
-def relay10_saved(sender, instance, created, **kwargs):
-    # todo instance.get_status ro bayad be client befrestonam
-    # todo message ro dorost konam
-    send_broker_message(message=instance.get_status(), client_id=instance.client_id)
-    MessageWareHouse(
-        relay10=instance,
-        message=instance.get_status(),
-    ).save()
+# @receiver(post_save, sender=Relay10)
+# def relay10_saved(sender, instance, created, **kwargs):
+#     # todo instance.get_status ro bayad be client befrestonam
+#     # todo message ro dorost konam
+#
+#     #  cd code type settings strategy hastesh majbor shaomda savesh konam
+#     message = Message(payload=instance.get_status(), _type="CD", device_id=sender.device_id)
+#     send_broker_message(message=message)
+#     MessageWareHouse(
+#         relay10=instance,
+#         message=instance.get_status(),
+#     ).save()

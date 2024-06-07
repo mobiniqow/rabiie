@@ -10,7 +10,7 @@ class Message:
         example 30303a30303a30303a30303a3030 ==>
         b''.fromhex("30303a30303a30303a30303a30303a3030").decode("utf-8") ==> 00:00:00:00:00:00
     """
-    TOLE_ZAMAN = 34
+    TOLE_ZAMAN = 19
 
     def __init__(self, payload, _type, device_id, _datetime=None):
         self.payload = payload
@@ -19,17 +19,20 @@ class Message:
         self.datetime = _datetime
 
     @classmethod
-    def from_byte(cls, byte):
-        body = json.loads(str(byte))
-        return cls(payload=body['payload'],device_id=body['device_id'],_type=body['type'])
+    def from_byte(cls, body):
+        # body = byte
+        # payload = body['payload'] if len(body['payload']) > 0 else ""
+        # _datetime = body['datetime'] if len(body['datetime']) > 0 else ""
+        # _type = body['type'] if len(body['type']) > 0 else ""
+        # device_id = body['device_id'] if len(body['device_id']) > 0 else ""
+        return cls(body['payload'],  body['type'],body['device_id'],  body['datetime'] )
 
     def get_time(self):
-        if self.datetime is not None:
-            return self.datetime
-        if len(self.payload) >= 28:
-            _datetime = self.payload[self.TOLE_ZAMAN:]
-            date_string = b"".fromhex(_datetime).decode("utf-8")
-            year, month, day, hour, _min, second = date_string.split(":")
+        if self.datetime is None:
+            return ""
+        else:
+            # date_string = b"".fromhex(_datetime).decode("utf-8")
+            year, month, day, hour, _min, second = self.datetime.split(":")
             year, month, day, hour, _min, second = (
                 int(year),
                 int(month),
@@ -41,9 +44,10 @@ class Message:
             # timezone = pytz.timezone("US/Pacific")
             tz = get_current_timezone()
             # dt = datetime(, tzinfo=timezone)
-            dt = datetime(year, month, day, hour, min, second, tzinfo=tz)
-            return dt.strftime("%y:%m:%d:%H:%M:%S")
-        return None
+            dt = datetime(year, month, day, hour, _min, second, tzinfo=tz)
+            # return dt
+            return dt
+
 
     def get_body(self):
         """
@@ -52,5 +56,5 @@ class Message:
             age time dare time ro azash kam mikonam va baghie ro bar migardonam
             :return:
         """
-        payload = self.payload if len(self.payload) < self.TOLE_ZAMAN else self.payload[: self.TOLE_ZAMAN]
+        payload = self.payload if len(self.payload) < self.TOLE_ZAMAN else self.payload[: -self.TOLE_ZAMAN]
         return payload

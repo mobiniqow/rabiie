@@ -1,14 +1,15 @@
+from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
+
 from authenticate.models import User
-from django.core.exceptions import ValidationError
 
 
 def day_validator(value):
     if len(value) != 7:
         raise ValidationError("تعداد روزها درست نیست")
     for i in range(7):
-        if "0" not in value[i] or "1" not in value[i]:
+        if value[i] not in ["1", "0"]:
             raise ValidationError("روز ها باید انتخاب شده باشه یا نه")
 
 
@@ -38,6 +39,12 @@ class DeviceTimer(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = (
+            ('relay10', 'relay_port_number'),
+            ('relay6', 'relay_port_number'),
+        )
 
     def clean(self):
         if self.relay10 and self.relay6:

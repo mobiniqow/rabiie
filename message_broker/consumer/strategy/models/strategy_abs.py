@@ -3,7 +3,8 @@ from abc import ABC, abstractmethod
 from message_broker.message.message import Message
 
 
-class MessageStrategy(ABC):
+class MessageStrategy:
+    __metaclass__ = ABC
     # in code unique hastesh yeki bare get hastesh yeki baraye set
     # get ha az samte client be ma mian
     # set ha az samte ma be client miravand

@@ -19,4 +19,4 @@ def get_device_by_id(device_id):
         relay = Relay10.objects.filter(device_id=device_id)
         if relay.exists():
             return relay.first(), RELAY_TEN,  10
-    return None, None
+    return None, None, None

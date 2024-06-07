@@ -1,11 +1,11 @@
 from django.contrib import admin
+
 from .models import Relay6, Relay10, Device, Psychrometer
 
 
 class Relay6Admin(admin.ModelAdmin):
     list_display = [
         "id",
-        # 'relay_name',
         "state",
         "device_id",
         "user",
@@ -17,6 +17,10 @@ class Relay6Admin(admin.ModelAdmin):
     search_fields = [
         "relay_name",
         "device_id",
+    ]
+    readonly_fields = [
+        'updated_at',
+        'created_at',
     ]
     list_editable = [
         "state",
@@ -43,6 +47,10 @@ class Relay10Admin(admin.ModelAdmin):
     ]
     list_editable = [
         "state",
+    ]
+    readonly_fields = [
+        'updated_at',
+        'created_at',
     ]
     list_per_page = 20
 

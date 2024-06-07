@@ -28,7 +28,6 @@ class GateWay(GatewayAbs):
         :param message:
         :return: felen chizi bar nemigardone valie dar ayande shayad ye tedad flag bar gardondam
         """
-        print(f"message.type {message.type}")
         strategy: MessageStrategy = self.__strategies[message.type]
         strategy.input(message)
 
