@@ -22,23 +22,25 @@ class SettingsStrategy(MessageStrategy):
     def input(self, message: Message):
         device_id = message.device_id
         device, _type, relay_size = get_device_by_id(device_id=device_id)
-        time = message.get_time()
+
         if _type == RELAY_SIX:
             logging.debug("this is relay10")
             # todo fix relay 6 jobs
             pass
         elif _type == RELAY_TEN:
             device: Relay10 = device
-            if device.updated_at < time:
+            payload = message.get_body()
+            if len(payload) > 0:
+                time = message.get_time()
                 logging.debug("find device by id ", device_id)
-                payload = message.get_body()
                 # binary_payload = hex_to_binary(payload, relay_size)
-                payload = hex_to_binary(payload, relay_size)
-                print(f'papayload {payload}\n')
-                for i in range(relay_size):
-                    bin2bool = lambda x: bool(int(x))
-                    setattr(device, f"r{i + 1}", bin2bool(payload[i]))
-                    device.save()
+                if device.updated_at < time:
+                    payload = hex_to_binary(payload, relay_size)
+                    print(f'papayload {payload}\n')
+                    for i in range(relay_size):
+                        bin2bool = lambda x: bool(int(x))
+                        setattr(device, f"r{i + 1}", bin2bool(payload[i]))
+                        device.save()
 
             # dar har sorat befreste chon time hashono ba ham sync konand
             logging.warning("update ghadimi hastesh")

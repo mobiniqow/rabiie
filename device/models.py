@@ -48,6 +48,7 @@ class BaseRelay(models.Model):
     # device_id len
     device_id = models.CharField(max_length=11, db_index=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    is_online = models.BooleanField(default=False)
 
     def reset(self):
         bool_fields = [
@@ -328,9 +329,13 @@ class Relay10(BaseRelay):
                 else:
                     temp = DAY_HOUR_NUMBER * OFF_CHAR
                 result += temp
+            result = hex(int(result, 2))[2:]
         else:
-            result = WEEK_DAY_NUMBER * DAY_HOUR_NUMBER * OFF_CHAR
-        print(f'result {result}')
+            #  in hex baraye yek roze kamele 24 saateshe
+            hex_one_day_all_off = "000000"
+            result = hex_one_day_all_off * WEEK_DAY_NUMBER
+        relay_number = hex(relay_number)[2:].zfill(2)
+        result = relay_number + result
         return result
 
 # @receiver(post_save, sender=Relay10)

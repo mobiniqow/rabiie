@@ -1,5 +1,5 @@
 from message_broker.consumer.strategy.models.strategy_abs import MessageStrategy
-from message_broker.message import Message
+from message_broker.message.message import Message
 
 
 class ServerTimeStrategy(MessageStrategy):
