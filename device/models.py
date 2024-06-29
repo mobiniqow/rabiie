@@ -325,17 +325,20 @@ class Relay10(BaseRelay):
                 if device_timer.days[i] == ON_CHAR:
                     temp = DAY_HOUR_NUMBER * OFF_CHAR
                     # yek ghesmat ro ON_CHAR mikone
-                    temp = temp[:device_timer.start_time] + len(temp[device_timer.start_time:device_timer.end_time+1]) * ON_CHAR + temp[device_timer.end_time+1:]
+                    temp = temp = OFF_CHAR * (device_timer.start_time - 1) + (
+                                device_timer.end_time + 1 - device_timer.start_time) * ON_CHAR + (
+                                              DAY_HOUR_NUMBER - device_timer.end_time) * OFF_CHAR
                 else:
                     temp = DAY_HOUR_NUMBER * OFF_CHAR
                 result += temp
-            result = hex(int(result, 2))[2:]
+            result = result
         else:
             #  in hex baraye yek roze kamele 24 saateshe
             hex_one_day_all_off = "000000"
             result = hex_one_day_all_off * WEEK_DAY_NUMBER
-        relay_number = hex(relay_number)[2:].zfill(2)
-        result = relay_number + result
+        # relay_number = hex(relay_number)[2:].zfill(2)
+        result = f'{relay_number:02}{result}'
+
         return result
 
 # @receiver(post_save, sender=Relay10)

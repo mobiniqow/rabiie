@@ -9,7 +9,6 @@ from message_broker.message_broker.rabbit_mq.consumer.callback.backend_callback 
 from message_broker.message_broker.rabbit_mq.rabbit_mq import RabbitMq
 
 if __name__ == '__main__':
-    # gateway: GateWay = GateWay()
     gateway: GatewayAbs = GateWay()
     gateway.add_strategy(SettingsStrategy())
     gateway.add_strategy(ServerTimeStrategy())

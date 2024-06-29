@@ -1,4 +1,3 @@
-import json
 from datetime import datetime
 
 from django.utils.timezone import get_current_timezone
@@ -28,10 +27,10 @@ class Message:
         return cls(body['payload'],  body['type'],body['device_id'],  body['datetime'] )
 
     def get_time(self):
-        if self.datetime is None:
+        if self.datetime is None or self.datetime == "":
             return ""
         else:
-            # date_string = b"".fromhex(_datetime).decode("utf-8")
+            print(f'self.datetime {self.datetime}')
             year, month, day, hour, _min, second = self.datetime.split(":")
             year, month, day, hour, _min, second = (
                 int(year),
@@ -41,11 +40,8 @@ class Message:
                 int(_min),
                 int(second),
             )
-            # timezone = pytz.timezone("US/Pacific")
             tz = get_current_timezone()
-            # dt = datetime(, tzinfo=timezone)
             dt = datetime(year, month, day, hour, _min, second, tzinfo=tz)
-            # return dt
             return dt
 
 

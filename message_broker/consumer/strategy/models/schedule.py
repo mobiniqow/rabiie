@@ -1,8 +1,6 @@
 import logging
 import os
 
-from timer.models import DeviceTimer
-
 os.environ['DJANGO_SETTINGS_MODULE']="core.settings.dev"
 from message_broker.message.message import Message
 from message_broker.producer.messager import send_broker_message
@@ -29,9 +27,8 @@ class ScheduleStrategy(MessageStrategy):
             pass
         elif _type == RELAY_TEN:
             device: Relay10 = device
-            DeviceTimer.objects.filter()
             if message.payload == "":
-                for relay_number in range(1, 8):
+                for relay_number in range(1, 10):
                     payload = device.get_schedular_date(relay_number)
                     datime = device.get_time()
                     message = Message(payload=payload, _type=self.get_code(), device_id=device_id,
@@ -49,19 +46,19 @@ class ScheduleStrategy(MessageStrategy):
                                       _datetime=datime)
 
                     self.output(message)
-                elif message.datetime != "":
-                    relay_number = int(message.payload[:2], 16)
-                    _hex = message.payload[2:]
-                    # binary = self.__hex_to_binary(_hex)
-                    print()
-                    # if relay_number <= relay_size:
-                    #     print(f'relay_number {relay_number}')
-                    #     payload = device.get_schedular_date(relay_number)
-                    #     print(f'relay_number payload {payload}')
-                    #     datime = device.get_time()
-                    #     message = Message(payload=payload, _type=self.get_code(), device_id=device_id,
-                    #                       _datetime=datime)
-                    #     self.output(message)
+            elif message.datetime != "":
+                print(f"message {message.payload}")
+                relay_number = int(message.payload[:2], 16)
+                _hex = message.payload[2:]
+                # binary = self.__hex_to_binary(_hex)
+                # if relay_number <= relay_size:
+                #     print(f'relay_number {relay_number}')
+                #     payload = device.get_schedular_date(relay_number)
+                #     print(f'relay_number payload {payload}')
+                #     datime = device.get_time()
+                #     message = Message(payload=payload, _type=self.get_code(), device_id=device_id,
+                #                       _datetime=datime)
+                #     self.output(message)
 
                 # bayad be hamin device akharin tanzimat ro ersal konim
 

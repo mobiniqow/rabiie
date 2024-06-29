@@ -1,6 +1,5 @@
 from core.settings.base import *
 from datetime import timedelta
-from decouple import config
 
 DEBUG = True
 
@@ -31,7 +30,7 @@ TEMPLATES = [
 ]
 ALLOWED_HOSTS = ["*"]
 STATIC_URL = "/static/"
-STATIC_ROOT = "/home/ubuntu/rabiie/staticfiles"
+STATIC_ROOT = "/var/www/html/rabiie/static"
 # STATICFILES_DIRS = ["/home/ubuntu/rabiie/staticfiles", ]
 MEDIA_URL = "/media/"
 MEDIA_ROOT = "/home/ubuntu/rabiie/mediafiles"

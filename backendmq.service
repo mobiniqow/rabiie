@@ -6,8 +6,8 @@ After=network.target
 [Service]
 User=ubuntu
 Group=www-data
-WorkingDirectory=/home/ubuntu/rabiie
-ExecStart=/home/ubuntu/rabiie/venv/bin/python3 /home/ubuntu/rabiie/main.py
+WorkingDirectory=/home/ubuntu/rabbie/backend
+ExecStart=/home/ubuntu/rabbie/backend/venv/bin/python3 /home/ubuntu/rabbie/backend/main.py
 
 [Install]
 WantedBy=multi-user.target
