@@ -19,12 +19,13 @@ class Message:
 
     @classmethod
     def from_byte(cls, body):
+        print(f'body2 {body}')
         # body = byte
         # payload = body['payload'] if len(body['payload']) > 0 else ""
         # _datetime = body['datetime'] if len(body['datetime']) > 0 else ""
         # _type = body['type'] if len(body['type']) > 0 else ""
         # device_id = body['device_id'] if len(body['device_id']) > 0 else ""
-        return cls(body['payload'],  body['type'],body['device_id'],  body['datetime'] )
+        return cls(body['payload'],  body['type'],body['device_id'],  body['datetime'])
 
     def get_time(self):
         if self.datetime is None or self.datetime == "":

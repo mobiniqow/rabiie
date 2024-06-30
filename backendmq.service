@@ -8,6 +8,8 @@ User=ubuntu
 Group=www-data
 WorkingDirectory=/home/ubuntu/rabbie/backend
 ExecStart=/home/ubuntu/rabbie/backend/venv/bin/python3 /home/ubuntu/rabbie/backend/main.py
+Restart=always
+RestartSec=3
 
 [Install]
 WantedBy=multi-user.target

@@ -37,7 +37,7 @@ class SettingsStrategy(MessageStrategy):
                 logging.debug("find device by id ", device_id)
                 if device.updated_at < time:
                     print(f'payload {payload}')
-                    payload =  payload
+                    payload = payload
                     print(f'papayload {payload}\n')
                     for i in range(relay_size):
                         bin2bool = lambda x: bool(int(x))
