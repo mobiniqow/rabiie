@@ -42,7 +42,7 @@ class BaseRelay(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(null=True, blank=True)
     client_id = models.CharField(max_length=55, blank=True, null=True)
     state = models.IntegerField(choices=State.choices, default=State.FREE)
     # device_id len
@@ -63,7 +63,7 @@ class BaseRelay(models.Model):
             field.name
             for field in self._meta.get_fields()
             if isinstance(field, models.ForeignKey)
-            and field.name.startswith("device_r")
+               and field.name.startswith("device_r")
         ]
         for field_name in fk_fields:
             setattr(self, field_name, None)
@@ -312,32 +312,29 @@ class Relay10(BaseRelay):
         ]
         # return [getattr(self, f'device_r{i}') for i in range(1, 11) if getattr(self, f'r{i}')]
 
-    def get_schedular_date(self, relay_number):
-        WEEK_DAY_NUMBER = 7
-        DAY_HOUR_NUMBER = 24
-        OFF_CHAR = '0'
-        ON_CHAR = '1'
+    def _time_to_binary(self, start, end):
+        day = 24
         result = ""
+        for i in range(day):
+            if start <= i+1 <= end:
+                result += "1"
+            else:
+                result += "0"
+        return result
+
+    def get_schedular_date(self, relay_number):
         device_timer = DeviceTimer.objects.filter(relay10=self, is_active=True, relay_port_number=relay_number, )
         if device_timer.exists():
             device_timer: DeviceTimer = device_timer.first()
-            for i in range(WEEK_DAY_NUMBER):
-                if device_timer.days[i] == ON_CHAR:
-                    temp = DAY_HOUR_NUMBER * OFF_CHAR
-                    # yek ghesmat ro ON_CHAR mikone
-                    temp = temp = OFF_CHAR * (device_timer.start_time - 1) + (
-                                device_timer.end_time + 1 - device_timer.start_time) * ON_CHAR + (
-                                              DAY_HOUR_NUMBER - device_timer.end_time) * OFF_CHAR
-                else:
-                    temp = DAY_HOUR_NUMBER * OFF_CHAR
-                result += temp
-            result = result
+            result = self._time_to_binary(device_timer.start_time, device_timer.end_time)
+            result = f'{relay_number:02}{device_timer.days}{result}'
+
         else:
-            #  in hex baraye yek roze kamele 24 saateshe
-            hex_one_day_all_off = "000000"
-            result = hex_one_day_all_off * WEEK_DAY_NUMBER
-        # relay_number = hex(relay_number)[2:].zfill(2)
-        result = f'{relay_number:02}{result}'
+
+            # in hex baraye yek roze kamele 24 saateshe
+            result = "0000000000000000000000000000000"
+            # relay_number = hex(relay_number)[2:].zfill(2)
+            result = f'{relay_number:02}{result}'
 
         return result
 

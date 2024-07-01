@@ -14,13 +14,13 @@ d#***django starter***
 ####development
 ``` export DJANGO_SETTINGS_MODULE=core.settings.dev```
 ####production
-`export DJANGO_SETTINGS_MODULE=core.settings.prod`
+`export DJANGO_SETTINGS_MODULE=core.settings.dev`
 
 ###windows
 ####develop
 `set DJANGO_SETTINGS_MODULE=core.settings.dev`
 ####production
-`set DJANGO_SETTINGS_MODULE=core.settings.prod`
+`set DJANGO_SETTINGS_MODULE=core.settings.dev`
 
 ####docker project 
 

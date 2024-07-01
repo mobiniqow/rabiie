@@ -1,7 +1,7 @@
 import logging
 import os
 
-os.environ['DJANGO_SETTINGS_MODULE'] = "core.settings.dev"
+
 from message_broker.message.message import Message
 from message_broker.producer.messager import send_broker_message
 import django

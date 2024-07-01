@@ -13,7 +13,7 @@ ExecStart=/home/ubuntu/rabbie/backend/venv/bin/gunicorn \
     --workers 3 \
     --bind unix:/run/rabiie.sock \
     core.wsgi:application \
-    --env DJANGO_SETTINGS_MODULE=core.settings.prod
+    --env DJANGO_SETTINGS_MODULE=core.settings.dev
 
 [Install]
 WantedBy=multi-user.target

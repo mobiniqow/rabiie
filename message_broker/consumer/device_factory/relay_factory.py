@@ -2,7 +2,7 @@ import os
 
 import django
 
-os.environ["DJANGO_MODULE_SETTINGS"] = "core.settings.prod"
+os.environ["DJANGO_MODULE_SETTINGS"] = "core.settings.dev"
 django.setup()
 
 from device.models import Relay10, Relay6
