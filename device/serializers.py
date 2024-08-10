@@ -26,7 +26,7 @@ class Relay10Details(serializers.ModelSerializer):
     class Meta:
         model = Relay10
         fields = "__all__"
-        read_only_fields = ("id", "product_id", "user")
+        read_only_fields = ("id", "user")
 
     def to_representation(self, instance):
         active_device = []
@@ -51,7 +51,7 @@ class Relay10Details(serializers.ModelSerializer):
             "active_device": active_device,
             "id": instance.id,
             "type": "relay10",
-            "product_id": instance.product_id,
+            "device_id": instance.device_id,
             "state": instance.state,
             "free_device": free_device,
         }
@@ -63,7 +63,7 @@ class Relay6Details(serializers.ModelSerializer):
         model = Relay6
 
     fields = "__all__"
-    read_only_fields = ("id", "product_id", "user")
+    read_only_fields = ("id", "user")
 
     def to_representation(self, instance):
         active_device = []
@@ -88,7 +88,7 @@ class Relay6Details(serializers.ModelSerializer):
             "active_device": active_device,
             "id": instance.id,
             "type": "relay6",
-            "product_id": instance.product_id,
+            "device_id": instance.device_id,
             "state": instance.state,
             "free_device": free_device,
         }
