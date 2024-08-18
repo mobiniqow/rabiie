@@ -43,6 +43,7 @@ urlpatterns = [
                 path("room/", include("room.urls")),
                 path("device/", include("device.urls")),
                 path("user-relation/", include("user_relations.urls")),
+                path("timer/", include("timer.urls")),
             ]
         ),
     ),

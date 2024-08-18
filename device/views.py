@@ -129,7 +129,9 @@ def client_device(request, device_id):
                 },
                 status=status.HTTP_404_NOT_FOUND,
             )
+
         relay.reset()
+
         if relay.user != request.user:
             return Response(
                 {"message": "invalid user"}, status=status.HTTP_400_BAD_REQUEST
