@@ -6,14 +6,14 @@ class Relay6Serializer(serializers.ModelSerializer):
     class Meta:
         model = Relay6
         fields = "__all__"
-        read_only_fields = ("id", "product_id", "user")
+        read_only_fields = ("id", "device_id", "user")
 
 
 class Relay10Serializer(serializers.ModelSerializer):
     class Meta:
         model = Relay10
         fields = "__all__"
-        read_only_fields = ("id", "product_id", "user")
+        read_only_fields = ("id", "device_id", "user")
 
 
 class DeviceSerializer(serializers.ModelSerializer):
@@ -101,12 +101,12 @@ class AddDeviceSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=39)
 
     def create(self, validated_data):
-        product_id = self.context.get("product_id")
+        device_id = self.context.get("device_id")
         device = Device.objects.get(id=self.data["device"])
-        if Relay10.objects.filter(product_id=product_id).exists():
-            relay = Relay10.objects.get(product_id=product_id)
+        if Relay10.objects.filter(device_id=device_id).exists():
+            relay = Relay10.objects.get(device_id=device_id)
         else:
-            relay = Relay6.objects.get(product_id=product_id)
+            relay = Relay6.objects.get(device_id=device_id)
         setattr(relay, f'device_r{self.data["port"]}', device)
         setattr(relay, f'name{self.data["port"]}', self.data["name"])
         relay.save()

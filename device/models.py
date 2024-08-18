@@ -1,8 +1,13 @@
 import uuid
 
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 from authenticate.models import User
+from message_broker.message.message import Message
+from message_broker.producer.messager import send_broker_message
+from message_warehouse.models import MessageWareHouse
 from timer.models import DeviceTimer
 
 
@@ -338,15 +343,15 @@ class Relay10(BaseRelay):
 
         return result
 
-# @receiver(post_save, sender=Relay10)
-# def relay10_saved(sender, instance, created, **kwargs):
-#     # todo instance.get_status ro bayad be client befrestonam
-#     # todo message ro dorost konam
-#
-#     #  cd code type settings strategy hastesh majbor shaomda savesh konam
-#     message = Message(payload=instance.get_status(), _type="CD", device_id=sender.device_id)
-#     send_broker_message(message=message)
-#     MessageWareHouse(
-#         relay10=instance,
-#         message=instance.get_status(),
-#     ).save()
+@receiver(post_save, sender=Relay10)
+def relay10_saved(sender, instance, created, **kwargs):
+    # todo instance.get_status ro bayad be client befrestonam
+    # todo message ro dorost konam
+
+    #  cd code type settings strategy hastesh majbor shaomda savesh konam
+    message = Message(payload=instance.get_payload(), _type="CD", device_id=sender.device_id)
+    send_broker_message(message=message)
+    MessageWareHouse(
+        relay10=instance,
+        message=instance.get_payload(),
+    ).save()
