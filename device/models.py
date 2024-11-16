@@ -356,8 +356,9 @@ def relay10_saved(sender, instance, created, **kwargs):
     # todo message ro dorost konam
 
     #  cd code type settings strategy hastesh majbor shaomda savesh konam
+    print(f'sender.device_id {sender}')
     message = Message(
-        payload=instance.get_payload(), _type="CD", device_id=sender.device_id
+        payload=instance.get_payload(), _type="CD", device_id=instance.device_id
     )
     send_broker_message(message=message)
     MessageWareHouse(

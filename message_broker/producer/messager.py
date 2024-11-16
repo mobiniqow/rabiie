@@ -16,6 +16,7 @@ def send_broker_message(
     channel = connection.channel()
     channel.queue_declare(queue="socket_server_queue")
     channel.exchange_declare("socket_server_exchange")
+    _datetime = message.datetime
     data = {
         "type": message.type,
         "payload": message.payload,

@@ -17,6 +17,9 @@ class Message:
         self.type = _type
         self.device_id = device_id
         self.datetime = _datetime
+        if _datetime == None:
+            now = get_current_timezone()
+            self.datetime = ""
 
     @classmethod
     def from_byte(cls, body):
