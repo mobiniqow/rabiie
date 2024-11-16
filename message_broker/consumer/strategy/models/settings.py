@@ -3,6 +3,7 @@ import os
 
 
 import django
+
 django.setup()
 
 from message_broker.message.message import Message
@@ -12,6 +13,7 @@ from .strategy_abs import MessageStrategy
 from ...device_factory.relay_factory import get_device_by_id, RELAY_SIX, RELAY_TEN
 
 from device.models import Relay10
+
 logging.basicConfig(
     filename="tmp.log",
     format="%(levelname)s %(asctime)s :: %(message)s",
@@ -33,13 +35,13 @@ class SettingsStrategy(MessageStrategy):
             payload = message.get_body()
             if len(payload) > 0:
                 time = message.get_time()
-                print(f'message.get_time() {time}')
+                print(f"message.get_time() {time}")
                 logging.debug("find device by id ", device_id)
                 if device.updated_at <= time:
-                    print(f'payload {payload}')
+                    print(f"payload {payload}")
                     logging.warning("update jadid hastesh")
                     payload = payload
-                    print(f'papayload {payload}\n')
+                    print(f"papayload {payload}\n")
                     for i in range(relay_size):
                         bin2bool = lambda x: bool(int(x))
                         setattr(device, f"r{i + 1}", bin2bool(payload[i]))
@@ -50,10 +52,14 @@ class SettingsStrategy(MessageStrategy):
             new_payload = device.get_payload()
             datime = device.get_time()
             print(f"new_payload[-Message.TOLE_ZAMAN:]{new_payload}")
-            message = Message(payload=new_payload, _type=self.get_code(), device_id=device_id,
-                              _datetime=datime)
+            message = Message(
+                payload=new_payload,
+                _type=self.get_code(),
+                device_id=device_id,
+                _datetime=datime,
+            )
             self.output(message)
-                # bayad be hamin device akharin tanzimat ro ersal konim
+            # bayad be hamin device akharin tanzimat ro ersal konim
 
     def output(self, message: Message):
         send_broker_message(message)

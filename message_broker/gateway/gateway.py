@@ -19,7 +19,7 @@ class GateWay(GatewayAbs):
         pass
 
     def add_strategy(self, strategy: MessageStrategy):
-        logging.log(INFO ,"add strategy successfully with code", strategy.get_code())
+        logging.log(INFO, "add strategy successfully with code", strategy.get_code())
         self.__strategies[strategy.get_code()] = strategy
 
     def input(self, message: Message):

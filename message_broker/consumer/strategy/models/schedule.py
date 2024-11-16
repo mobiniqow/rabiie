@@ -34,25 +34,34 @@ class ScheduleStrategy(MessageStrategy):
                 for relay_number in range(1, 10):
                     payload = device.get_schedular_date(relay_number)
                     datime = device.get_time()
-                    message = Message(payload=payload, _type=self.get_code(), device_id=device_id,
-                                      _datetime=datime)
+                    message = Message(
+                        payload=payload,
+                        _type=self.get_code(),
+                        device_id=device_id,
+                        _datetime=datime,
+                    )
                     self.output(message)
             #  agar date time khali bod yani in ke timer hasho mikhad set kone
             elif message.datetime == "":
                 relay_number = int(message.payload, 10)
                 if relay_number <= relay_size:
-                    print(f'relay_number {relay_number}')
+                    print(f"relay_number {relay_number}")
                     payload = device.get_schedular_date(relay_number)
-                    print(f'relay_number payload {payload}')
+                    print(f"relay_number payload {payload}")
                     datime = device.get_time()
-                    message = Message(payload=payload, _type=self.get_code(), device_id=device_id,
-                                      _datetime=datime)
+                    message = Message(
+                        payload=payload,
+                        _type=self.get_code(),
+                        device_id=device_id,
+                        _datetime=datime,
+                    )
                     self.output(message)
             elif message.datetime != "":
                 print(f"message {message.payload}")
                 relay_number = int(message.payload[:2], 10)
-                device_timer = DeviceTimer.objects.filter(relay_port_number=relay_number,
-                                                          relay10__device_id=message.device_id)
+                device_timer = DeviceTimer.objects.filter(
+                    relay_port_number=relay_number, relay10__device_id=message.device_id
+                )
                 start_time, end_time = self.__get_range_time(message.payload[9:])
                 days = message.payload[2:9]
                 if device_timer.exists():
@@ -72,14 +81,15 @@ class ScheduleStrategy(MessageStrategy):
                             device_timer.save()
                 elif start_time != -1:
                     relay = Relay10.objects.get(device_id=message.device_id)
-                    DeviceTimer.objects.create(relay_port_number=relay_number,
-                                               relay10=relay,
-                                               start_time=start_time,
-                                               end_time=end_time,
-                                               days=days,
-                                               user=relay.user,
-                                               updated_at=message.get_time()
-                                               )
+                    DeviceTimer.objects.create(
+                        relay_port_number=relay_number,
+                        relay10=relay,
+                        start_time=start_time,
+                        end_time=end_time,
+                        days=days,
+                        user=relay.user,
+                        updated_at=message.get_time(),
+                    )
 
     def output(self, message: Message):
         send_broker_message(message)
@@ -103,7 +113,7 @@ class ScheduleStrategy(MessageStrategy):
         start_time = -1
         end_time = -1
         for index, hour in enumerate(time_binary):
-            if hour == '1':
+            if hour == "1":
                 # agar avalin addad ro did bege starte va shayad hamon saat
                 # ham mitone entehashbashe end time hame hamon value mizarim
                 if start_time == -1:

@@ -1,12 +1,12 @@
 import logging
 import os
+import django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings.prod')
 
+django.setup()
 
 from message_broker.message.message import Message
 from message_broker.producer.messager import send_broker_message
-import django
-
-django.setup()
 from .strategy_abs import MessageStrategy
 from ...device_factory.relay_factory import get_device_by_id, RELAY_SIX, RELAY_TEN
 
@@ -21,8 +21,8 @@ logging.basicConfig(
 
 class ConnectivityStrategy(MessageStrategy):
     """
-        agar 1 to pay load bod onnline hastesh
-        agar 0 bod offline hastesh
+    agar 1 to pay load bod onnline hastesh
+    agar 0 bod offline hastesh
     """
 
     def input(self, message: Message):

@@ -5,11 +5,18 @@ import pika
 
 class RabbitMq:
     """
-        in class rabbit mq hastesh ke consumer hasho be sorate interface tarif kardam
-        va behesh ezafe mikonam
+    in class rabbit mq hastesh ke consumer hasho be sorate interface tarif kardam
+    va behesh ezafe mikonam
     """
 
-    def __init__(self, url, port, user_name, password, virtual_host, ):
+    def __init__(
+        self,
+        url,
+        port,
+        user_name,
+        password,
+        virtual_host,
+    ):
         self.url = url
         self.port = port
         self.user_name = user_name

@@ -20,7 +20,7 @@ def send_broker_message(
         "type": message.type,
         "payload": message.payload,
         "device_id": message.device_id,
-        "datetime": message.datetime
+        "datetime": message.datetime,
     }
     channel.basic_publish(
         exchange="socket_server_exchange",

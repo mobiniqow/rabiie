@@ -68,7 +68,7 @@ class BaseRelay(models.Model):
             field.name
             for field in self._meta.get_fields()
             if isinstance(field, models.ForeignKey)
-               and field.name.startswith("device_r")
+            and field.name.startswith("device_r")
         ]
         for field_name in fk_fields:
             setattr(self, field_name, None)
@@ -321,27 +321,34 @@ class Relay10(BaseRelay):
         day = 24
         result = ""
         for i in range(day):
-            if start <= i+1 <= end:
+            if start <= i + 1 <= end:
                 result += "1"
             else:
                 result += "0"
         return result
 
     def get_schedular_date(self, relay_number):
-        device_timer = DeviceTimer.objects.filter(relay10=self, is_active=True, relay_port_number=relay_number, )
+        device_timer = DeviceTimer.objects.filter(
+            relay10=self,
+            is_active=True,
+            relay_port_number=relay_number,
+        )
         if device_timer.exists():
             device_timer: DeviceTimer = device_timer.first()
-            result = self._time_to_binary(device_timer.start_time, device_timer.end_time)
-            result = f'{relay_number:02}{device_timer.days}{result}'
+            result = self._time_to_binary(
+                device_timer.start_time, device_timer.end_time
+            )
+            result = f"{relay_number:02}{device_timer.days}{result}"
 
         else:
 
             # in hex baraye yek roze kamele 24 saateshe
             result = "0000000000000000000000000000000"
             # relay_number = hex(relay_number)[2:].zfill(2)
-            result = f'{relay_number:02}{result}'
+            result = f"{relay_number:02}{result}"
 
         return result
+
 
 @receiver(post_save, sender=Relay10)
 def relay10_saved(sender, instance, created, **kwargs):
@@ -349,7 +356,9 @@ def relay10_saved(sender, instance, created, **kwargs):
     # todo message ro dorost konam
 
     #  cd code type settings strategy hastesh majbor shaomda savesh konam
-    message = Message(payload=instance.get_payload(), _type="CD", device_id=sender.device_id)
+    message = Message(
+        payload=instance.get_payload(), _type="CD", device_id=sender.device_id
+    )
     send_broker_message(message=message)
     MessageWareHouse(
         relay10=instance,

@@ -18,4 +18,3 @@ class GatewayAbs:
     @abstractmethod
     def add_strategy(self, strategy: MessageStrategy) -> None:
         pass
-

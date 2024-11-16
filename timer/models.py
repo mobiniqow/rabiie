@@ -42,8 +42,8 @@ class DeviceTimer(models.Model):
 
     class Meta:
         unique_together = (
-            ('relay10', 'relay_port_number'),
-            ('relay6', 'relay_port_number'),
+            ("relay10", "relay_port_number"),
+            ("relay6", "relay_port_number"),
         )
 
     def clean(self):

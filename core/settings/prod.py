@@ -6,9 +6,9 @@ DEBUG = True
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "USER": "postgres",
-        "PASSWORD": "postgres",
-        "NAME": "rabiie",
+        "USER": "iot_user",
+        "PASSWORD": "ewrasdfwqe",
+        "NAME": "iot",
         "HOST": "localhost",
         "PORT": "5432",
     }
@@ -30,10 +30,10 @@ TEMPLATES = [
 ]
 ALLOWED_HOSTS = ["*"]
 STATIC_URL = "/static/"
-STATIC_ROOT = "/var/www/html/rabiie/static"
+STATIC_ROOT = "/var/www/html/iot/staticfiles"
 # STATICFILES_DIRS = ["/home/ubuntu/rabiie/staticfiles", ]
 MEDIA_URL = "/media/"
-MEDIA_ROOT = "/home/ubuntu/rabiie/mediafiles"
+MEDIA_ROOT = "/var/www/html/iot/mediafiles"
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(hours=4),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=45),

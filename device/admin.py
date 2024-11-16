@@ -19,8 +19,8 @@ class Relay6Admin(admin.ModelAdmin):
         "device_id",
     ]
     readonly_fields = [
-        'updated_at',
-        'created_at',
+        "updated_at",
+        "created_at",
     ]
     list_editable = [
         "state",
@@ -49,8 +49,8 @@ class Relay10Admin(admin.ModelAdmin):
         "state",
     ]
     readonly_fields = [
-        'updated_at',
-        'created_at',
+        "updated_at",
+        "created_at",
     ]
     list_per_page = 20
 

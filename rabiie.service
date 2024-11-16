@@ -8,7 +8,7 @@ After=network.target
 User=ubuntu
 Group=www-data
 WorkingDirectory=/home/ubuntu/rabbie/backend
-ExecStart=/home/ubuntu/rabbie/backend/venv/bin/gunicorn \
+ExecStart=/home/ubuntu/iot/backend/venv/bin/gunicorn \
     --access-logfile - \
     --workers 3 \
     --bind unix:/run/rabiie.sock \

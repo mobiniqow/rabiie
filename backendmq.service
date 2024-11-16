@@ -7,8 +7,8 @@ After=network.target
 User=ubuntu
 Environment="DJANGO_SETTINGS_MODULE=core.settings.prod"
 Group=www-data
-WorkingDirectory=/home/ubuntu/rabbie/backend
-ExecStart=/home/ubuntu/rabbie/backend/venv/bin/python3 /home/ubuntu/rabbie/backend/main.py
+WorkingDirectory=/home/ubuntu/iot/backend
+ExecStart=/home/ubuntu/iot/backend/venv/bin/python3 /home/ubuntu/iot/backend/main.py
 Restart=always
 RestartSec=3
 

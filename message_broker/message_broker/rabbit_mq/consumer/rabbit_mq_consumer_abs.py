@@ -2,7 +2,9 @@ from abc import ABC
 
 from pika.adapters.blocking_connection import BlockingChannel
 
-from message_broker.message_broker.rabbit_mq.consumer.callback.consumer_observer_abs import ConsumerObserver
+from message_broker.message_broker.rabbit_mq.consumer.callback.consumer_observer_abs import (
+    ConsumerObserver,
+)
 
 
 class RabbitMQConsumerABS(object):
@@ -12,9 +14,16 @@ class RabbitMQConsumerABS(object):
     consumer yani masraf konande yani kasi ke data ro masraf mikone va estefade mikone
     """
 
-    def __init__(self, channel: BlockingChannel, observable: ConsumerObserver, routing_key, exchange, queue):
+    def __init__(
+        self,
+        channel: BlockingChannel,
+        observable: ConsumerObserver,
+        routing_key,
+        exchange,
+        queue,
+    ):
         channel.queue_declare(queue=queue)
-        channel.exchange_declare(exchange=exchange, exchange_type='direct')
+        channel.exchange_declare(exchange=exchange, exchange_type="direct")
         channel.queue_bind(
             queue=queue,
             exchange=exchange,
@@ -24,6 +33,7 @@ class RabbitMQConsumerABS(object):
         channel.basic_consume(
             queue=queue, on_message_callback=observable, auto_ack=True
         )
+
     # def __call__(self, ch, method, properties, body):
     #     """
     #         in method in ye magic method hastesh va be ma in emkan ro mide

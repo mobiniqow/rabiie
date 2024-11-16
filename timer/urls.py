@@ -7,8 +7,4 @@ from .views import DeviceTimerView
 router = DefaultRouter()
 router.register("", DeviceTimerView, basename="rooms")
 
-urlpatterns = [
-    path(
-        "", include(router.urls)
-    )
-]
+urlpatterns = [path("", include(router.urls))]
