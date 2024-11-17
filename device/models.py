@@ -51,7 +51,7 @@ class BaseRelay(models.Model):
     client_id = models.CharField(max_length=55, blank=True, null=True)
     state = models.IntegerField(choices=State.choices, default=State.FREE)
     # device_id len
-    device_id = models.CharField(max_length=11, db_index=True)
+    device_id = models.CharField(max_length=110, db_index=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     is_online = models.BooleanField(default=False)
 
@@ -358,7 +358,7 @@ def relay10_saved(sender, instance, created, **kwargs):
     #  cd code type settings strategy hastesh majbor shaomda savesh konam
     print(f'sender.device_id {sender}')
     message = Message(
-        payload=instance.get_payload(), _type="CD", device_id=instance.device_id
+        payload=instance.get_payload(), _type="CD", device_id=instance.device_id,_datetime=instance.updated_at.strftime("%Y:%m:%d:%H:%M:%S")
     )
     send_broker_message(message=message)
     MessageWareHouse(
