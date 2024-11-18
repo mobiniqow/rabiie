@@ -18,10 +18,10 @@ class ServerTimeStrategy(MessageStrategy):
     def input(self, message: Message):
         _datetime = now()
         message = Message(
-            payload=_datetime.strftime("%Y:%m:%d:%H:%M:%S"),
+            payload=_datetime.strftime("%m:%d:%y:%H:%M:%S"),
             _type=self.get_code(),
             device_id=message.device_id,
-            _datetime=_datetime.strftime("%Y:%m:%d:%H:%M:%S"),
+            _datetime=_datetime.strftime("%m:%d:%y:%H:%M:%S"),
         )
         self.output(message)
         # bayad be hamin device akharin tanzimat ro ersal konim

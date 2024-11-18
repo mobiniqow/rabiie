@@ -51,7 +51,7 @@ class BaseRelay(models.Model):
     client_id = models.CharField(max_length=55, blank=True, null=True)
     state = models.IntegerField(choices=State.choices, default=State.FREE)
     # device_id len
-    device_id = models.CharField(max_length=11, db_index=True)
+    device_id = models.CharField(max_length=110, db_index=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     is_online = models.BooleanField(default=False)
 
@@ -350,17 +350,49 @@ class Relay10(BaseRelay):
         return result
 
 
-@receiver(post_save, sender=Relay10)
-def relay10_saved(sender, instance, created, **kwargs):
+#@receiver(post_save, sender=Relay10)
+#def relay10_saved(sender, instance, created, **kwargs):
+#    print(f'sender.device_id {sender}')
+#    message = Message(
+#        payload=instance.get_payload(), _type="CD", device_id=instance.device_id,_datetime=instance.updated_at.strftime("%Y:%m:%d:%H:%M:%S")
+#    )
+
+#    send_broker_message(message=message)
+#    MessageWareHouse(
+#        relay10=instance,
+#        message=instance.get_payload(),
+#    ).save()
+import threading
+import time
+
+#@receiver(post_save, sender=Relay10)
+#def relay10_saved(sender, instance, created, **kwargs):
     # todo instance.get_status ro bayad be client befrestonam
     # todo message ro dorost konam
 
-    #  cd code type settings strategy hastesh majbor shaomda savesh konam
-    message = Message(
-        payload=instance.get_payload(), _type="CD", device_id=sender.device_id
-    )
-    send_broker_message(message=message)
-    MessageWareHouse(
-        relay10=instance,
-        message=instance.get_payload(),
-    ).save()
+    # cd code type settings strategy hastesh majbor shaomda savesh konam
+ #   print(f'sender.device_id {sender}')
+    
+  #  def send_message_with_delay():
+        # تاخیر 500 میلی‌ثانیه قبل از ارسال پیام
+   #     time.sleep(0.1)
+        
+        # ساخت پیام
+#        message = Message(
+#            payload=instance.get_payload(), 
+#            _type="CD", 
+#            device_id=instance.device_id,
+#            _datetime=instance.updated_at.strftime("%Y:%m:%d %H:%M:%S")  # فرمت صحیح تاریخ و زمان
+#        )
+
+        # ارسال پیام
+#        send_broker_message(message=message)
+        
+        # ذخیره در MessageWareHouse
+#        MessageWareHouse(
+#            relay10=instance,
+#            message=instance.get_payload(),
+#        ).save()
+
+    # اجرای تابع در ترد مجزا
+#    threading.Thread(target=send_message_with_delay).start()

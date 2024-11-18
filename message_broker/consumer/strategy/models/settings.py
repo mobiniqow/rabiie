@@ -37,7 +37,7 @@ class SettingsStrategy(MessageStrategy):
                 time = message.get_time()
                 print(f"message.get_time() {time}")
                 logging.debug("find device by id ", device_id)
-                if device.updated_at <= time:
+                if device.updated_at is None or device.updated_at <= time:
                     print(f"payload {payload}")
                     logging.warning("update jadid hastesh")
                     payload = payload
@@ -45,7 +45,7 @@ class SettingsStrategy(MessageStrategy):
                     for i in range(relay_size):
                         bin2bool = lambda x: bool(int(x))
                         setattr(device, f"r{i + 1}", bin2bool(payload[i]))
-                        device.save()
+
                     device.updated_at = time
                     device.save()
                     Relay10.objects.filter(pk=device.id).update(updated_at=time)
@@ -56,7 +56,7 @@ class SettingsStrategy(MessageStrategy):
                 payload=new_payload,
                 _type=self.get_code(),
                 device_id=device_id,
-                _datetime=datime,
+                _datetime=datime.strftime("%m:%d:%y:%H:%M:%S"),
             )
             self.output(message)
             # bayad be hamin device akharin tanzimat ro ersal konim
