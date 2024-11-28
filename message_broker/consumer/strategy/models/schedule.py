@@ -104,6 +104,7 @@ class ScheduleStrategy(MessageStrategy):
         DeviceTimer.objects.all().delete()
         for timer in device_timers:
             timer.relay10 = device
+            timer.user = device.user
             timer.save()
 
 
