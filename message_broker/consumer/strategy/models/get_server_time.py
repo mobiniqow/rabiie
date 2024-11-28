@@ -6,7 +6,7 @@ import time
 from message_broker.message.message import Message
 from message_broker.producer.messager import send_broker_message
 from .strategy_abs import MessageStrategy
-from ...device_factory.relay_factory import get_device_by_id, RELAY_SIX, RELAY_TEN
+from ...device_factory.relay_factory import get_device_by_id, RELAY_TEN
 from device.models import Relay10
 
 logging.basicConfig(
@@ -21,14 +21,12 @@ class ServerTimeStrategy(MessageStrategy):
         device_id = message.device_id
         device, _type, relay_size = get_device_by_id(device_id=device_id)
         payload = message.get_body()
-        _datetime = timezone.now()  # Server's current time
-
-        # If payload is empty, send server time
+        _datetime = timezone.now()
         if message.payload == "":
             payload = _datetime.strftime("%m/%d/%y:%H:%M:%S")
             message = Message(
                 payload=payload,
-                _type=self.get_code(),
+                _type="WT",
                 device_id=device_id,
                 _datetime=_datetime.strftime("%m/%d/%y:%H:%M:%S"),
             )
@@ -59,7 +57,21 @@ class ServerTimeStrategy(MessageStrategy):
                     device_id=device_id,
                     _datetime="",
                 )
-
+                time.sleep(1)
+                self.output(message)
+                time.sleep(1)
+                # halat relay haro benevisam
+                for relay_number in range(1, 11):
+                    payload = device.get_schedular_date(relay_number)
+                    datime = device.get_time()
+                    message = Message(
+                        payload=payload,
+                        _type="WS",
+                        device_id=device_id,
+                        _datetime="",
+                    )
+                    time.sleep(1)
+                    self.output(message)
             else:
                 print(f"Sending WR (new settings) for device {device_id}")
                 logging.warning("Sending new settings with WR code")
@@ -71,12 +83,12 @@ class ServerTimeStrategy(MessageStrategy):
                     _datetime="",
                 )
                 # taghvim
-                message = Message(
-                    payload="",
-                    _type="RS",
-                    device_id=device_id,
-                    _datetime="",
-                )
+                # message = Message(
+                #     payload="",
+                #     _type="RS",
+                #     device_id=device_id,
+                #     _datetime="",
+                # )
 
             # ارسال پیام
             time.sleep(0.3)
@@ -86,7 +98,7 @@ class ServerTimeStrategy(MessageStrategy):
         send_broker_message(message)
 
     def get_code(self) -> str:
-        return "ST"
+        return "RT"
 
     def create_new_payload(self, device: Relay10) -> str:
         # This function creates a new payload for the device

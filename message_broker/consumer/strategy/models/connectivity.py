@@ -44,7 +44,7 @@ class ConnectivityStrategy(MessageStrategy):
             payload = _datetime.strftime("%m/%d/%y:%H:%M:%S")
             message = Message(
                 payload=payload,
-                _type="ST",
+                _type="WT",
                 device_id=device_id,
                 _datetime=_datetime.strftime("%m/%d/%y:%H:%M:%S"),
             )
@@ -56,4 +56,4 @@ class ConnectivityStrategy(MessageStrategy):
         send_broker_message(message)
 
     def get_code(self) -> str:
-        return "VV"
+        return "RG"

@@ -1,11 +1,12 @@
 import logging
 
 import django
+from django.db import transaction
 
 from timer.models import DeviceTimer
 
 django.setup()
-
+import time
 from message_broker.message.message import Message
 from message_broker.producer.messager import send_broker_message
 from .strategy_abs import MessageStrategy
@@ -31,71 +32,86 @@ class ScheduleStrategy(MessageStrategy):
         elif _type == RELAY_TEN:
             device: Relay10 = device
             if message.payload == "":
-                for relay_number in range(1, 10):
+                for relay_number in range(1, 11):
                     payload = device.get_schedular_date(relay_number)
                     datime = device.get_time()
                     message = Message(
                         payload=payload,
-                        _type=self.get_code(),
+                        _type="WS",
                         device_id=device_id,
-                        _datetime=datime,
+                        _datetime="",
                     )
+                    time.sleep(1)
                     self.output(message)
             #  agar date time khali bod yani in ke timer hasho mikhad set kone
-            elif message.datetime == "":
-                relay_number = int(message.payload, 10)
-                if relay_number <= relay_size:
-                    print(f"relay_number {relay_number}")
-                    payload = device.get_schedular_date(relay_number)
-                    print(f"relay_number payload {payload}")
-                    datime = device.get_time()
-                    message = Message(
-                        payload=payload,
-                        _type=self.get_code(),
-                        device_id=device_id,
-                        _datetime=datime,
-                    )
-                    self.output(message)
-            elif message.datetime != "":
-                print(f"message {message.payload}")
-                relay_number = int(message.payload[:2], 10)
-                device_timer = DeviceTimer.objects.filter(
-                    relay_port_number=relay_number, relay10__device_id=message.device_id
-                )
-                start_time, end_time = self.__get_range_time(message.payload[9:])
-                days = message.payload[2:9]
-                if device_timer.exists():
-                    device_timer: DeviceTimer = device_timer.first()
-                    if device_timer.updated_at <= message.get_time():
-                        if start_time == -1:
-                            device_timer.is_active = False
-                            device_timer.days = "0000000"
-                            device.updated_at = message.get_time()
-                            device.save()
+            else :
+                if len(message.payload) == 2:
+                    relay_number = int(message.payload)
+                    print(f"relay_number2 {relay_number}")
+                    print(f"message.payload {message.payload}")
+                    if relay_number <= relay_size:
+                        print(f"relay_number {relay_number}")
+                        payload = device.get_schedular_date(relay_number)
+                        print(f"relay_number payload {payload}")
+                        datime = device.get_time()
+                        message = Message(
+                            payload=payload,
+                            _type=self.get_code(),
+                            device_id=device_id,
+                            _datetime="",
+                        )
+                        time.sleep(1)
+                        self.output(message)
+                else:
+                    self.set_time_relay(device,message.payload)
+            # elif message.datetime != "":
+            #     print(f"message {message.payload}")
+            #     relay_number = int(message.payload[:2], 10)
+            #     device_timer = DeviceTimer.objects.filter(
+            #         relay_port_number=relay_number, relay10__device_id=message.device_id
+            #     )
+            #     start_time, end_time = self.__get_range_time(message.payload[9:])
+            #     days = message.payload[2:9]
+            #     if device_timer.exists():
+            #         device_timer: DeviceTimer = device_timer.first()
+            #         if device_timer.updated_at <= message.get_time():
+            #             if start_time == -1:
+            #                 device_timer.is_active = False
+            #                 device_timer.days = "0000000"
+            #                 device.updated_at = message.get_time()
+            #                 device.save()
+            #
+            #             else:
+            #                 device_timer.start_time = start_time
+            #                 device_timer.end_time = end_time
+            #                 device_timer.days = days
+            #                 device_timer.updated_at = message.get_time()
+            #                 device_timer.save()
+            #     elif start_time != -1:
+            #         relay = Relay10.objects.get(device_id=message.device_id)
+            #         DeviceTimer.objects.create(
+            #             relay_port_number=relay_number,
+            #             relay10=relay,
+            #             start_time=start_time,
+            #             end_time=end_time,
+            #             days=days,
+            #             user=relay.user,
+            #             updated_at=message.get_time(),
+            #         )
+    @transaction.atomic
+    def set_time_relay(self, device,payload):
+        device_timers = DeviceTimer.parse_schedule( payload)
+        DeviceTimer.objects.all().delete()
+        for timer in device_timers:
+            timer.relay10 = device
+            timer.save()
 
-                        else:
-                            device_timer.start_time = start_time
-                            device_timer.end_time = end_time
-                            device_timer.days = days
-                            device_timer.updated_at = message.get_time()
-                            device_timer.save()
-                elif start_time != -1:
-                    relay = Relay10.objects.get(device_id=message.device_id)
-                    DeviceTimer.objects.create(
-                        relay_port_number=relay_number,
-                        relay10=relay,
-                        start_time=start_time,
-                        end_time=end_time,
-                        days=days,
-                        user=relay.user,
-                        updated_at=message.get_time(),
-                    )
 
     def output(self, message: Message):
         send_broker_message(message)
 
     def get_code(self) -> str:
-        return "SD"
+        return "RS"
 
     def __hex_to_binary(self, _hex):
         WEEK = 7
