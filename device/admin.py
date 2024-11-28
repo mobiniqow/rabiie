@@ -1,10 +1,10 @@
 from django.contrib import admin
 
 from .models import Relay6, Relay10, Device, Psychrometer
-
+from django.utils import timezone
 from message_broker.message.message import Message
 from message_broker.producer.messager import send_broker_message
-
+from datetime import date
 class Relay6Admin(admin.ModelAdmin):
     list_display = [
         "id",
@@ -60,17 +60,20 @@ class Relay10Admin(admin.ModelAdmin):
         return super().get_queryset(request).select_related("user")
 
     def save_model(self, request, obj, form, change):
+        # به روز رسانی دستی updated_at
+        obj.updated_at = timezone.now()  # زمان فعلی را به روز رسانی می‌کنیم
 
+        # ارسال پیام برای بروکر
+        message = Message(
+            payload=obj.get_payload(),
+            _type="CD",
+            device_id=obj.device_id,
+            _datetime=obj.updated_at.strftime("%m/%d/%y:%H:%M:%S")  # فرمت صحیح تاریخ و زمان
+        )
+        send_broker_message(message=message)
+
+        # ذخیره مدل
         super().save_model(request, obj, form, change)
-        if obj.updated_at is not None:
-            message = Message(
-                payload=obj.get_payload(), 
-                _type="CD",
-                device_id=obj.device_id,
-                _datetime=obj.updated_at.strftime("%m:%d:%y:%H:%M:%S")  # فرمت صحیح تاریخ و زمان
-            )
-            send_broker_message(message=message)
-        
 admin.site.register(Relay6, Relay6Admin)
 admin.site.register(Relay10, Relay10Admin)
 admin.site.register(Device)

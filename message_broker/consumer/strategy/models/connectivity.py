@@ -10,6 +10,8 @@ from message_broker.producer.messager import send_broker_message
 from .strategy_abs import MessageStrategy
 from ...device_factory.relay_factory import get_device_by_id, RELAY_SIX, RELAY_TEN
 
+from django.utils.timezone import now
+import time
 from device.models import Relay10
 
 logging.basicConfig(
@@ -38,6 +40,16 @@ class ConnectivityStrategy(MessageStrategy):
             device.is_online = is_online
             print("Device %s %s %S", device_id, "state", is_online)
             device.save()
+            _datetime = now()
+            payload = _datetime.strftime("%m/%d/%y:%H:%M:%S")
+            message = Message(
+                payload=payload,
+                _type="ST",
+                device_id=device_id,
+                _datetime=_datetime.strftime("%m/%d/%y:%H:%M:%S"),
+            )
+            time.sleep(0.3)
+            self.output(message)
             # bayad be hamin device akharin tanzimat ro ersal konim
 
     def output(self, message: Message):
