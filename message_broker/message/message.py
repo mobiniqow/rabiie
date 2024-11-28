@@ -47,7 +47,7 @@ class Message:
             )
             tz = get_current_timezone()
             dt = datetime(year, month, day, hour, _min, second, tzinfo=tz)
-            return dt
+            return dt.strftime("%m/%d/%y:%H:%M:%S")
 
     def get_body(self):
         """

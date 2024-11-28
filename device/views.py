@@ -3,6 +3,8 @@ from rest_framework.decorators import api_view
 from rest_framework.generics import ListAPIView, get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from message_broker.message.message import Message
+from message_broker.producer.messager import send_broker_message
 
 from device.models import Relay10, Relay6, Device
 from device.serializers import (
@@ -84,9 +86,14 @@ def search_device_socket(request, device_id):
             return Response(
                 {"message": "object not found"}, status=status.HTTP_404_NOT_FOUND
             )
+
         serializer.is_valid(raise_exception=True)
-        serializer.save()
-        print(serializer.data)
+        instance = serializer.save()
+        message = Message(
+            payload=instance.get_payload(), _type="CD", device_id=instance.device_id,_datetime=instance.get_time()
+        )
+
+        send_broker_message(message=message)
         return Response({"message": serializer.data})
 
 

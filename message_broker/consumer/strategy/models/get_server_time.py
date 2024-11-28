@@ -13,7 +13,7 @@ logging.basicConfig(
     level=logging.DEBUG,
 )
 
-
+import time
 class ServerTimeStrategy(MessageStrategy):
     def input(self, message: Message):
         _datetime = now()
@@ -23,6 +23,7 @@ class ServerTimeStrategy(MessageStrategy):
             device_id=message.device_id,
             _datetime=_datetime.strftime("%m:%d:%y:%H:%M:%S"),
         )
+        time.sleep(0.3)
         self.output(message)
         # bayad be hamin device akharin tanzimat ro ersal konim
 

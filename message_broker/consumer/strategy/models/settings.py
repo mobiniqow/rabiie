@@ -1,6 +1,7 @@
+
 import logging
 import os
-
+import time
 
 import django
 
@@ -13,6 +14,7 @@ from .strategy_abs import MessageStrategy
 from ...device_factory.relay_factory import get_device_by_id, RELAY_SIX, RELAY_TEN
 
 from device.models import Relay10
+import time
 
 logging.basicConfig(
     filename="tmp.log",
@@ -56,8 +58,10 @@ class SettingsStrategy(MessageStrategy):
                 payload=new_payload,
                 _type=self.get_code(),
                 device_id=device_id,
-                _datetime=datime.strftime("%m:%d:%y:%H:%M:%S"),
+                _datetime=datime,
             )
+            import time
+            time.sleep(0.5)
             self.output(message)
             # bayad be hamin device akharin tanzimat ro ersal konim
 

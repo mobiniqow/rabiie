@@ -40,12 +40,6 @@ class DeviceTimer(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(null=True, blank=True)
 
-    class Meta:
-        unique_together = (
-            ("relay10", "relay_port_number"),
-            ("relay6", "relay_port_number"),
-        )
-
     def clean(self):
         if self.relay10 and self.relay6:
             raise ValidationError("Only one of relay10 or relay6 can be active.")

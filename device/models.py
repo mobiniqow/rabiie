@@ -171,7 +171,6 @@ class Relay6(BaseRelay):
         related_name="relay6_device_r6",
     )
 
-
 class Relay10(BaseRelay):
     r1 = models.BooleanField()
     r2 = models.BooleanField()
@@ -282,10 +281,14 @@ class Relay10(BaseRelay):
         return payload
 
     def get_time(self):
-        time = f'{self.updated_at.strftime("%Y:%m:%d:%H:%M:%S")}'
+        if self.updated_at is not None:
+            time = f'{self.updated_at.strftime("%m/%d/%y:%H:%M:%S")}'
+        else:
+            time = f'{self.created_at.strftime("%m/%d/%y:%H:%M:%S")}'
         return time
 
-    # def get_status(self):
+    # def w
+#get_status(self):
     #     payload = (
     #         f"{1 if self.r1 else 0}"
     #         f"{1 if self.r2 else 0}"
@@ -327,26 +330,47 @@ class Relay10(BaseRelay):
                 result += "0"
         return result
 
+#    def get_schedular_date(self, relay_number):
+#        device_timer = DeviceTimer.objects.filter(
+#            relay10=self,
+#            is_active=True,
+#            relay_port_number=relay_number,
+#        )
+#        if device_timer.exists():
+#            device_timer: DeviceTimer = device_timer.first()
+#            result = self._time_to_binary(
+#                device_timer.start_time, device_timer.end_time
+#            )
+#            result = f"{relay_number:02}{device_timer.days}{result}"
+
+#        else:
+#            result = "0000000000000000000000000000000"
+#            result = f"{relay_number:02}{result}"
+#        return result
+    def binary_to_hex(self,binary_string):
+        hex_result = hex(int(binary_string, 2))[2:].upper()  # تبدیل به هگزادسیمال و حذف '0x'
+        hex_result = hex_result.zfill(42)
+        return hex_result
+
     def get_schedular_date(self, relay_number):
-        device_timer = DeviceTimer.objects.filter(
-            relay10=self,
+        device_timers = DeviceTimer.objects.filter(
             is_active=True,
             relay_port_number=relay_number,
         )
-        if device_timer.exists():
-            device_timer: DeviceTimer = device_timer.first()
-            result = self._time_to_binary(
-                device_timer.start_time, device_timer.end_time
-            )
-            result = f"{relay_number:02}{device_timer.days}{result}"
-
-        else:
-
-            # in hex baraye yek roze kamele 24 saateshe
-            result = "0000000000000000000000000000000"
-            # relay_number = hex(relay_number)[2:].zfill(2)
-            result = f"{relay_number:02}{result}"
-
+        if not device_timers.exists():
+            return f"{relay_number:02}000000000000000000000000000000000000000000"
+        schedule = [0] * (7 * 24)
+        for device_timer in device_timers:
+            days = device_timer.days
+            for i, day_active in enumerate(days):  
+                if day_active == '1':  
+                    for hour in range(device_timer.start_time, device_timer.end_time):
+                        index = i * 24 + hour
+                        if index < 7 * 24:  # اطمینان از این که ایندکس معتبر است
+                            schedule[index] = 1  # ساعت
+        binary_result = ''.join(map(str, schedule))
+        hex_result = self.binary_to_hex(binary_result)
+        result = f"{relay_number:02}{hex_result}"
         return result
 
 
@@ -365,34 +389,3 @@ class Relay10(BaseRelay):
 import threading
 import time
 
-#@receiver(post_save, sender=Relay10)
-#def relay10_saved(sender, instance, created, **kwargs):
-    # todo instance.get_status ro bayad be client befrestonam
-    # todo message ro dorost konam
-
-    # cd code type settings strategy hastesh majbor shaomda savesh konam
- #   print(f'sender.device_id {sender}')
-    
-  #  def send_message_with_delay():
-        # تاخیر 500 میلی‌ثانیه قبل از ارسال پیام
-   #     time.sleep(0.1)
-        
-        # ساخت پیام
-#        message = Message(
-#            payload=instance.get_payload(), 
-#            _type="CD", 
-#            device_id=instance.device_id,
-#            _datetime=instance.updated_at.strftime("%Y:%m:%d %H:%M:%S")  # فرمت صحیح تاریخ و زمان
-#        )
-
-        # ارسال پیام
-#        send_broker_message(message=message)
-        
-        # ذخیره در MessageWareHouse
-#        MessageWareHouse(
-#            relay10=instance,
-#            message=instance.get_payload(),
-#        ).save()
-
-    # اجرای تابع در ترد مجزا
-#    threading.Thread(target=send_message_with_delay).start()
