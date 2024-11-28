@@ -76,7 +76,7 @@ class DeviceTimer(models.Model):
             start_time = times[0]
             end_time = times[1]
             dt = DeviceTimer()
-            dt.relay10 = relay_number
+            dt.relay_port_number = relay_number
             dt.is_active = True
             dt.start_time = start_time
             dt.end_time = end_time
@@ -87,13 +87,12 @@ class DeviceTimer(models.Model):
     @staticmethod
     def get_time_and_date(data):
         result_set = set(item for sublist in data for item in sublist)
-        items = ""
+        items = []
         for i in result_set:
             tmp = ""
             for index in data:
                 tmp += "1" if i in index else "0"
-            items += f"{i[0]},{i[1]}={tmp}"
-            tmp = ""
+            items .append(f"{i[0]},{i[1]}={tmp}")
         return items
 
     def clean(self):
