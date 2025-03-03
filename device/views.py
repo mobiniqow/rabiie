@@ -90,7 +90,7 @@ def search_device_socket(request, device_id):
         serializer.is_valid(raise_exception=True)
         instance = serializer.save()
         message = Message(
-            payload=instance.get_payload(), _type="CD", device_id=instance.device_id,_datetime=instance.get_time()
+            payload=instance.get_payload(), _type="WR", device_id=instance.device_id,_datetime=instance.get_time()
         )
 
         send_broker_message(message=message)

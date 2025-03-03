@@ -66,7 +66,7 @@ class Relay10Admin(admin.ModelAdmin):
         # ارسال پیام برای بروکر
         message = Message(
             payload=obj.get_payload(),
-            _type="CD",
+            _type="WR",
             device_id=obj.device_id,
             _datetime=obj.updated_at.strftime("%m/%d/%y:%H:%M:%S")  # فرمت صحیح تاریخ و زمان
         )
