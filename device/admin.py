@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.db import models
 
 from .models import Relay6, Relay10, Device, Psychrometer
 from django.utils import timezone
@@ -74,7 +75,32 @@ class Relay10Admin(admin.ModelAdmin):
 
         # ذخیره مدل
         super().save_model(request, obj, form, change)
+
+class PsychrometerAdmin(admin.ModelAdmin):
+    def save_model(self, request, obj, form, change):
+        obj.updated_at = timezone.now()
+        relay = Relay6.objects.filter(
+            models.Q(t1=obj) |
+            models.Q(t2=obj) |
+            models.Q(t3=obj) |
+            models.Q(t4=obj) |
+            models.Q(t5=obj) |
+            models.Q(t6=obj)
+        ).first()
+
+        if relay:
+            for i in range(1, 7):
+                if getattr(relay, f"t{i}") == obj:
+                    relay_number = i
+                    break
+        message = Message(
+            payload=f'{relay_number:02}{obj.get_body()}',
+            _type="WH",
+            device_id=relay.device_id,
+            _datetime=obj.updated_at.strftime("%m/%d/%y:%H:%M:%S")
+        )
+        send_broker_message(message=message)
 admin.site.register(Relay6, Relay6Admin)
 admin.site.register(Relay10, Relay10Admin)
-admin.site.register(Device)
-admin.site.register(Psychrometer)
+# admin.site.register(Device,DeviceAdmin)
+admin.site.register(Psychrometer,PsychrometerAdmin)

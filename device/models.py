@@ -33,8 +33,32 @@ class Psychrometer(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    hc = models.BooleanField(default=False)
+    ma = models.BooleanField(default=False)
+    on_of = models.BooleanField(default=False)
+    plus_minus = models.BooleanField(default=False)
+    current_value = models.IntegerField(default=0)
+    destination_value = models.IntegerField(default=0)
+    tolerance = models.IntegerField(default=0)
+
     def __str__(self):
         return self.name
+
+    def get_body(self):
+        return (
+            f"{int(self.hc)}{int(self.ma)}{int(self.on_of)}{int(self.plus_minus)}"
+            f"{self.destination_value:03}{self.tolerance:02}"
+        )
+
+    def set_payload(self, payload):
+        self.hc = bool(int(payload[0]))
+        self.ma = bool(int(payload[1]))
+        self.on_of = bool(int(payload[2]))
+        self.plus_minus = bool(int(payload[3]))
+        self.destination_value = int(payload[4:7])
+        self.tolerance = int(payload[7:9])
+        self.current_value = int(payload[9:12])
+        print(f"payload {payload}")
 
 
 class BaseRelay(models.Model):
@@ -68,7 +92,7 @@ class BaseRelay(models.Model):
             field.name
             for field in self._meta.get_fields()
             if isinstance(field, models.ForeignKey)
-            and field.name.startswith("device_r")
+               and field.name.startswith("device_r")
         ]
         for field_name in fk_fields:
             setattr(self, field_name, None)
@@ -127,7 +151,7 @@ class Relay6(BaseRelay):
     r4 = models.BooleanField()
     r5 = models.BooleanField()
     r6 = models.BooleanField()
-
+    updated_at = models.DateTimeField(auto_now=True)
     device_r1 = models.ForeignKey(
         Device,
         on_delete=models.SET_NULL,
@@ -170,6 +194,32 @@ class Relay6(BaseRelay):
         blank=True,
         related_name="relay6_device_r6",
     )
+    name1 = models.CharField(max_length=39, null=True, blank=True)
+    name2 = models.CharField(max_length=39, null=True, blank=True)
+    name3 = models.CharField(max_length=39, null=True, blank=True)
+    name4 = models.CharField(max_length=39, null=True, blank=True)
+    name5 = models.CharField(max_length=39, null=True, blank=True)
+    name6 = models.CharField(max_length=39, null=True, blank=True)
+
+    def get_payload(self, relay=0):
+        payload = ""
+        if relay == 0:
+            for i in range(1, 7):
+                payload += getattr(self, f't{i}').get_body()
+        else:
+            payload = getattr(self, f't{relay}').get_body()
+        return payload
+
+    def write_payload(self, relay=0, payload=""):
+        print(f"hi my device is  {payload} {relay}")
+        if relay != 0:
+            temperature = getattr(self, f't{relay}')
+            temperature.set_payload(payload)
+            temperature.save()
+            print(f"hi my device is  {payload}")
+            payload = getattr(self, f't{relay}').get_body()
+        return payload
+
 
 class Relay10(BaseRelay):
     r1 = models.BooleanField()
@@ -287,26 +337,6 @@ class Relay10(BaseRelay):
             time = f'{self.created_at.strftime("%m/%d/%y:%H:%M:%S")}'
         return time
 
-    # def w
-#get_status(self):
-    #     payload = (
-    #         f"{1 if self.r1 else 0}"
-    #         f"{1 if self.r2 else 0}"
-    #         f"{1 if self.r3 else 0}"
-    #         f"{1 if self.r4 else 0}"
-    #         f"{1 if self.r5 else 0}"
-    #         f"{1 if self.r6 else 0}"
-    #         f"{1 if self.r7 else 0}"
-    #         f"{1 if self.r8 else 0}"
-    #         f"{1 if self.r9 else 0}"
-    #         f"{1 if self.r10 else 0}"
-    #     )
-    #     time = f'{self.updated_at.strftime("%Y:%m:%d:%H:%M:%S")}'
-    #     print(f"time{time}")
-    #     payload_hex = binary_to_hex(payload)
-    #     time_hex = string_to_hex(time)
-    #
-    #     return payload + time
 
     def get_active_device_by_state_and_name(self):
         return [
@@ -330,24 +360,7 @@ class Relay10(BaseRelay):
                 result += "0"
         return result
 
-#    def get_schedular_date(self, relay_number):
-#        device_timer = DeviceTimer.objects.filter(
-#            relay10=self,
-#            is_active=True,
-#            relay_port_number=relay_number,
-#        )
-#        if device_timer.exists():
-#            device_timer: DeviceTimer = device_timer.first()
-#            result = self._time_to_binary(
-#                device_timer.start_time, device_timer.end_time
-#            )
-#            result = f"{relay_number:02}{device_timer.days}{result}"
-
-#        else:
-#            result = "0000000000000000000000000000000"
-#            result = f"{relay_number:02}{result}"
-#        return result
-    def binary_to_hex(self,binary_string):
+    def binary_to_hex(self, binary_string):
         hex_result = hex(int(binary_string, 2))[2:].upper()  # تبدیل به هگزادسیمال و حذف '0x'
         hex_result = hex_result.zfill(42)
         return hex_result
@@ -362,8 +375,8 @@ class Relay10(BaseRelay):
         schedule = [0] * (7 * 24)
         for device_timer in device_timers:
             days = device_timer.days
-            for i, day_active in enumerate(days):  
-                if day_active == '1':  
+            for i, day_active in enumerate(days):
+                if day_active == '1':
                     for hour in range(device_timer.start_time, device_timer.end_time):
                         index = i * 24 + hour
                         if index < 7 * 24:  # اطمینان از این که ایندکس معتبر است
@@ -373,19 +386,5 @@ class Relay10(BaseRelay):
         result = f"{relay_number:02}{hex_result}"
         return result
 
-
-#@receiver(post_save, sender=Relay10)
-#def relay10_saved(sender, instance, created, **kwargs):
-#    print(f'sender.device_id {sender}')
-#    message = Message(
-#        payload=instance.get_payload(), _type="CD", device_id=instance.device_id,_datetime=instance.updated_at.strftime("%Y:%m:%d:%H:%M:%S")
-#    )
-
-#    send_broker_message(message=message)
-#    MessageWareHouse(
-#        relay10=instance,
-#        message=instance.get_payload(),
-#    ).save()
 import threading
 import time
-

@@ -2,6 +2,7 @@ from message_broker.consumer.strategy.models.connectivity import ConnectivityStr
 from message_broker.consumer.strategy.models.get_server_time import ServerTimeStrategy
 from message_broker.consumer.strategy.models.schedule import ScheduleStrategy
 from message_broker.consumer.strategy.models.device_state  import  DeviceStateStrategy
+from message_broker.consumer.strategy.models.temperature_read import TemperatureStrategy
 from message_broker.gateway.gateway import GateWay
 from message_broker.gateway.gateway_abs import GatewayAbs
 from message_broker.message_broker.rabbit_mq.consumer.backend_consumer import (
@@ -14,6 +15,7 @@ from message_broker.message_broker.rabbit_mq.rabbit_mq import RabbitMq
 
 if __name__ == "__main__":
     gateway: GatewayAbs = GateWay()
+    gateway.add_strategy( TemperatureStrategy())
     gateway.add_strategy(DeviceStateStrategy())
     gateway.add_strategy(ServerTimeStrategy())
     gateway.add_strategy(ScheduleStrategy())
