@@ -100,7 +100,9 @@ class PsychrometerAdmin(admin.ModelAdmin):
             _datetime=obj.updated_at.strftime("%m/%d/%y:%H:%M:%S")
         )
         send_broker_message(message=message)
+class DeviceAdmin(admin.ModelAdmin):
+    pass
 admin.site.register(Relay6, Relay6Admin)
 admin.site.register(Relay10, Relay10Admin)
-# admin.site.register(Device,DeviceAdmin)
+admin.site.register(Device,DeviceAdmin)
 admin.site.register(Psychrometer,PsychrometerAdmin)

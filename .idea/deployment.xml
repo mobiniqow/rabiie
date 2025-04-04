@@ -3,10 +3,17 @@
   <component name="PublishConfigData" remoteFilesAllowedToDisappearOnAutoupload="false" confirmBeforeUploading="false">
     <option name="confirmBeforeUploading" value="false" />
     <serverData>
+      <paths name="octavaz_ir">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
       <paths name="rabiie (project level)">
         <serverdata>
           <mappings>
-            <mapping deploy="/home/ubuntu/iot" local="$PROJECT_DIR$" />
+            <mapping deploy="/home/ubuntu/iot/backend" local="$PROJECT_DIR$" />
           </mappings>
         </serverdata>
       </paths>
