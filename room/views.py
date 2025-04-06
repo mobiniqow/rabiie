@@ -1,3 +1,5 @@
+from logging import raiseExceptions
+
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
@@ -25,13 +27,14 @@ class RoomDeviceView(APIView):
         return Response(serializer.data)
 
     def post(self, request, room_id):
+
         try:
             room = Room.objects.get(id=room_id)
         except Room.DoesNotExist:
             return Response({"error": "اتاق مورد نظر پیدا نشد"}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = RoomDeviceSerializer(data=request.data)
-        if serializer.is_valid():
+        if serializer.is_valid(raiseExceptions=True):
             serializer.save(room=room)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

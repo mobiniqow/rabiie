@@ -15,7 +15,7 @@ from device.serializers import (
     AddDeviceSerializer,
     Relay6Details,
 )
-from room.models import Room
+from room.models import Room, RoomDevice
 
 
 @api_view(("GET", "PATCH"))
@@ -137,7 +137,6 @@ def client_device(request, device_id):
                 return Response({"message": serializer.data})
 
             elif request.method == "POST":
-                # پیدا کردن دستگاه بر اساس device_id
                 devices = Relay10.objects.filter(device_id=device_id)
                 if devices.exists():
                     relay = devices.first()
@@ -145,37 +144,28 @@ def client_device(request, device_id):
                     devices = Relay6.objects.filter(device_id=device_id)
                     if devices.exists():
                         relay = devices.first()
-
-                # اگر دستگاه پیدا نشد
                 if not devices.exists():
                     return Response({
                         "message": len(Relay10.objects.filter(device_id=device_id)),
                         "id": device_id,
                     }, status=status.HTTP_404_NOT_FOUND)
-
-                # ریست کردن دستگاه
                 relay.reset()
-
-                # بررسی مالک دستگاه
                 if relay.user != request.user:
                     return Response({"message": "invalid user"}, status=status.HTTP_400_BAD_REQUEST)
-
-                # ایجاد و ذخیره دستگاه جدید
-                serializer = AddDeviceSerializer(data=request.data, context={"device_id": device_id})
-
-                # بررسی صحت داده‌ها و ذخیره کردن
+                serializer = AddDeviceSerializer(data=request.data, context={"device_id": device_id,
+                                                                             "devices":devices[0].id})
                 if serializer.is_valid():
-                    # قبل از ذخیره دستگاه، بررسی روم و افزودن آن
-                    room_id = request.data.get("room_id")
+                    room_id = request.POST["room_id"]
                     if room_id:
                         try:
                             room = Room.objects.get(id=room_id)
-                            relay.room = room  # اتصال به روم
+                            relay.room = room
                             relay.save()
                         except Room.DoesNotExist:
                             return Response({"message": "Room not found"}, status=status.HTTP_404_NOT_FOUND)
-
                     serializer.save()
+                    new_device = Device.objects.get(id=request.POST["device"])
+                    RoomDevice.objects.create(room=room,device=new_device)
                     return Response({"message": serializer.data})
                 else:
                     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
