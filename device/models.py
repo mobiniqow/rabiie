@@ -337,7 +337,6 @@ class Relay10(BaseRelay):
             time = f'{self.created_at.strftime("%m/%d/%y:%H:%M:%S")}'
         return time
 
-
     def get_active_device_by_state_and_name(self):
         return [
             {
@@ -377,14 +376,24 @@ class Relay10(BaseRelay):
             days = device_timer.days
             for i, day_active in enumerate(days):
                 if day_active == '1':
-                    for hour in range(device_timer.start_time, device_timer.end_time):
+                    for hour in range(device_timer.start_time-1, device_timer.end_time ):
                         index = i * 24 + hour
-                        if index < 7 * 24:  # اطمینان از این که ایندکس معتبر است
-                            schedule[index] = 1  # ساعت
+                        if index < 7 * 24:
+                            schedule[index] = 1
         binary_result = ''.join(map(str, schedule))
+        print(f'binary_result i {binary_result}')
+        binary_result = self.reverse_week(binary_result)
+        print(f'reverse_week i {binary_result}')
         hex_result = self.binary_to_hex(binary_result)
+
         result = f"{relay_number:02}{hex_result}"
         return result
 
-import threading
-import time
+    def reverse_day_binary(self, day_binary):
+        return day_binary[::-1]
+
+    def reverse_week(self, week_binary):
+        result = ""
+        for i in range(7):
+            result += self.reverse_day_binary(week_binary[i* 24:((i + 1) * 24)])
+        return result

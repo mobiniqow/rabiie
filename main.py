@@ -15,7 +15,7 @@ from message_broker.message_broker.rabbit_mq.rabbit_mq import RabbitMq
 
 if __name__ == "__main__":
     gateway: GatewayAbs = GateWay()
-    gateway.add_strategy( TemperatureStrategy())
+    gateway.add_strategy(TemperatureStrategy())
     gateway.add_strategy(DeviceStateStrategy())
     gateway.add_strategy(ServerTimeStrategy())
     gateway.add_strategy(ScheduleStrategy())

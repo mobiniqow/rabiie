@@ -14,6 +14,7 @@ def day_validator(value):
 
 
 class DeviceTimer(models.Model):
+    name = models.CharField(max_length=100, blank=True, null=True)
     is_active = models.BooleanField(default=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
     relay10 = models.ForeignKey(
