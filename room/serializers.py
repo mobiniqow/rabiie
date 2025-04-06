@@ -1,4 +1,6 @@
 from rest_framework import serializers
+
+from device.serializers import DeviceSerializer
 from .models import Room, RoomDevice, RoomPicture
 
 
@@ -27,6 +29,9 @@ class RoomSerializer(serializers.ModelSerializer):
 
 
 class RoomDeviceSerializer(serializers.ModelSerializer):
+    room = RoomSerializer(read_only=True)
+    device = DeviceSerializer(read_only=True)
+
     class Meta:
         model = RoomDevice
         fields = "__all__"

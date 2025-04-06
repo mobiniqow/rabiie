@@ -1,5 +1,6 @@
 from django.db import models
 from authenticate.models import User
+from device.models import Device
 
 
 class RoomPicture(models.Model):
@@ -24,6 +25,7 @@ class RoomDevice(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     room = models.ForeignKey(Room, on_delete=models.SET_NULL, null=True)
+    device = models.ForeignKey(Device, on_delete=models.SET_NULL, null=True)
     # device = models.ForeignKey(UserDevice, on_delete=models.SET_NULL, null=True)
 
 
