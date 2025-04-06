@@ -1,5 +1,8 @@
 from rest_framework import serializers
-from .models import Relay10, Relay6, Device
+from django.shortcuts import get_object_or_404
+
+from room.models import Room, RoomDevice
+from .models import Relay10, Relay6, Device, Psychrometer
 
 
 class Relay6Serializer(serializers.ModelSerializer):
@@ -20,6 +23,7 @@ class DeviceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Device
         fields = "__all__"
+
 
 
 class Relay10Details(serializers.ModelSerializer):
@@ -111,3 +115,63 @@ class AddDeviceSerializer(serializers.Serializer):
         setattr(relay, f'name{self.data["port"]}', self.data["name"])
         relay.save()
         return relay
+
+class PsychrometerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Psychrometer
+        fields = '__all__'
+
+    def create(self, validated_data):
+        # اگر نیاز به اعمال تغییرات اضافی دارید می‌توانید در اینجا انجام دهید
+        return Psychrometer.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        # اگر نیاز به اعمال تغییرات اضافی برای آپدیت دارید می‌توانید در اینجا انجام دهید
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance
+
+
+class AddPsychrometerToRelay6Serializer(serializers.Serializer):
+    port = serializers.IntegerField()
+    psychrometer = PsychrometerSerializer()
+    room_id = serializers.IntegerField(required=False)
+
+    def validate_port(self, value):
+        if value < 1 or value > 6:
+            raise serializers.ValidationError("Port number must be between 1 and 6.")
+        return value
+
+    def create(self, validated_data):
+        psychrometer_data = validated_data.pop("psychrometer")
+        psychrometer = Psychrometer.objects.create(**psychrometer_data)
+
+        relay6_id = self.context.get("relay6_id")
+        relay = Relay6.objects.get(id=relay6_id)
+
+        port = validated_data["port"]
+        setattr(relay, f"t{port}", psychrometer)
+        relay.save()
+
+        room_id = validated_data.get("room_id")
+        if room_id:
+            try:
+                room = Room.objects.get(id=room_id)
+                RoomDevice.objects.create(room=room, psychrometer=psychrometer)
+            except Room.DoesNotExist:
+                raise serializers.ValidationError({"room_id": "Room not found"})
+
+        # برای استفاده در to_representation ذخیره‌اش می‌کنیم
+        self.psychrometer = psychrometer
+        self.port = port
+        self.room_id = room_id
+
+        return psychrometer
+
+    def to_representation(self, instance):
+        return {
+            "port": self.port,
+            "psychrometer": PsychrometerSerializer(self.psychrometer).data,
+            "room_id": self.room_id
+        }

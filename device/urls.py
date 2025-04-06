@@ -4,7 +4,7 @@ from .views import (
     DeviceViewSet,
     search_device_socket,
     client_device,
-    KeyDevice,
+    KeyDevice, add_psychrometer_to_relay6, UpdatePsychrometerAPIView,
 )
 
 urlpatterns = [
@@ -13,4 +13,11 @@ urlpatterns = [
     path("<str:device_id>/", search_device, name="search"),
     path("socket/<str:device_id>/", search_device_socket, name="docket"),
     path("client/<str:device_id>/", client_device, name="client"),
+
+    # API برای ارسال درخواست POST و PATCH برای افزودن یا به‌روزرسانی Psychrometer در Relay6
+    path('relay6/<uuid:relay6_id>/add_psychrometer/', add_psychrometer_to_relay6,
+         name='add_psychrometer_to_relay6_api'),
+    path("relay6/<uuid:relay6_id>/port/<int:port>/psychrometer/", UpdatePsychrometerAPIView.as_view(),
+         name="update-psychrometer"),
+
 ]

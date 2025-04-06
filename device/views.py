@@ -6,14 +6,14 @@ from rest_framework.views import APIView
 from message_broker.message.message import Message
 from message_broker.producer.messager import send_broker_message
 from django.db import transaction
-from device.models import Relay10, Relay6, Device
+from device.models import Relay10, Relay6, Device, Psychrometer
 from device.serializers import (
     Relay10Serializer,
     Relay6Serializer,
     DeviceSerializer,
     Relay10Details,
     AddDeviceSerializer,
-    Relay6Details,
+    Relay6Details, AddPsychrometerToRelay6Serializer, PsychrometerSerializer,
 )
 from room.models import Room, RoomDevice
 
@@ -197,3 +197,71 @@ class KeyDevice(ListAPIView):
 #     devices = get_object_or_404(Relay10, pk=relay10_id)
 #
 #     return Response(serializer.data)
+
+@api_view(["POST",])
+def add_psychrometer_to_relay6(request, relay6_id):
+    try:
+        with transaction.atomic():
+            # ابتدا تلاش می‌کنیم تا رله را پیدا کنیم
+            relay6 = Relay6.objects.get(id=relay6_id)
+
+            # بررسی اینکه درخواست به‌صورت POST یا PATCH است
+            if request.method == "POST":
+                # استفاده از سریالایزر برای پردازش داده‌ها
+                serializer = AddPsychrometerToRelay6Serializer(data=request.data, context={"relay6_id": relay6_id})
+
+                if serializer.is_valid():
+                    # ذخیره‌سازی داده‌ها
+                    serializer.save()
+
+                    return Response({"message": "Psychrometer added successfully", "data": serializer.data}, status=status.HTTP_201_CREATED)
+                else:
+                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+    except Relay6.DoesNotExist:
+        return Response({"message": "Relay6 not found"}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class UpdatePsychrometerAPIView(APIView):
+    def patch(self, request, relay6_id, port):
+        if port < 1 or port > 6:
+            return Response({"error": "Invalid port number. Must be between 1 and 6."}, status=status.HTTP_400_BAD_REQUEST)
+
+        relay = get_object_or_404(Relay6, id=relay6_id)
+        psychrometer = getattr(relay, f"t{port}", None)
+
+        if psychrometer is None:
+            return Response({"error": "No psychrometer found on this port."}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = PsychrometerSerializer(psychrometer, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, relay6_id, port):
+        if port < 1 or port > 6:
+            return Response({"error": "Invalid port number. Must be between 1 and 6."},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        relay = get_object_or_404(Relay6, id=relay6_id)
+        psychrometer = getattr(relay, f"t{port}", None)
+
+        if not psychrometer:
+            return Response({"error": "No psychrometer connected to this port."}, status=status.HTTP_404_NOT_FOUND)
+
+        # پاک‌کردن ارتباط با RoomDevice‌ها
+        RoomDevice.objects.filter(psychrometer=psychrometer).delete()
+
+        # پاک‌کردن ارتباط از Relay
+        setattr(relay, f"t{port}", None)
+        relay.save()
+
+        # حذف خود Psychrometer
+        psychrometer.delete()
+
+        return Response({"message": f"Psychrometer on port {port} deleted along with related RoomDevice(s)."},
+                        status=status.HTTP_204_NO_CONTENT)

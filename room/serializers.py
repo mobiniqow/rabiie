@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from device.serializers import DeviceSerializer
+from device.serializers import DeviceSerializer, PsychrometerSerializer
 from .models import Room, RoomDevice, RoomPicture
 
 
@@ -29,12 +29,15 @@ class RoomSerializer(serializers.ModelSerializer):
 
 
 class RoomDeviceSerializer(serializers.ModelSerializer):
-    room = RoomSerializer(read_only=True)
+    room = serializers.PrimaryKeyRelatedField(queryset=Room.objects.all(), write_only=True)
+
     device = DeviceSerializer(read_only=True)
+    psychrometer = PsychrometerSerializer(read_only=True)
 
     class Meta:
         model = RoomDevice
         fields = "__all__"
+
 
 
 class RoomPictureSerializer(serializers.ModelSerializer):
