@@ -6,14 +6,14 @@ from rest_framework.views import APIView
 from message_broker.message.message import Message
 from message_broker.producer.messager import send_broker_message
 from django.db import transaction
-from device.models import Relay10, Relay6, Device, Psychrometer
+from device.models import Relay10, Relay6, Device, Psychrometer, PsychrometerImage
 from device.serializers import (
     Relay10Serializer,
     Relay6Serializer,
     DeviceSerializer,
     Relay10Details,
     AddDeviceSerializer,
-    Relay6Details, AddPsychrometerToRelay6Serializer, PsychrometerSerializer,
+    Relay6Details, AddPsychrometerToRelay6Serializer, PsychrometerSerializer, PsychrometerImageSerializer,
 )
 from room.models import Room, RoomDevice
 
@@ -190,6 +190,10 @@ class DeviceViewSet(APIView):
 class KeyDevice(ListAPIView):
     queryset = Device.objects.all()
     serializer_class = DeviceSerializer
+
+class PsychrometerImageView(ListAPIView):
+    queryset = PsychrometerImage.objects.all()
+    serializer_class = PsychrometerImageSerializer
 
 
 # @api_view(("GET",))

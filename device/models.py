@@ -22,17 +22,22 @@ class Device(models.Model):
         return self.name
 
 
+class PsychrometerImage(models.Model):
+    image = models.ImageField(upload_to="psychrometer/image", null=True, blank=True)
+
+
 class Psychrometer(models.Model):
     class Mode(models.IntegerChoices):
         THERMOMETER = 1
+
         HUMIDITY = 2
 
     mod = models.IntegerField(choices=Mode.choices)
+    image = models.ForeignKey(PsychrometerImage, on_delete=models.CASCADE, null=True, blank=True)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     name = models.CharField(max_length=23)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
     hc = models.BooleanField(default=False)
     ma = models.BooleanField(default=False)
     on_of = models.BooleanField(default=False)
@@ -376,7 +381,7 @@ class Relay10(BaseRelay):
             days = device_timer.days
             for i, day_active in enumerate(days):
                 if day_active == '1':
-                    for hour in range(device_timer.start_time-1, device_timer.end_time ):
+                    for hour in range(device_timer.start_time - 1, device_timer.end_time):
                         index = i * 24 + hour
                         if index < 7 * 24:
                             schedule[index] = 1
@@ -395,5 +400,5 @@ class Relay10(BaseRelay):
     def reverse_week(self, week_binary):
         result = ""
         for i in range(7):
-            result += self.reverse_day_binary(week_binary[i* 24:((i + 1) * 24)])
+            result += self.reverse_day_binary(week_binary[i * 24:((i + 1) * 24)])
         return result

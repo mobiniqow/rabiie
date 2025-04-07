@@ -4,12 +4,13 @@ from .views import (
     DeviceViewSet,
     search_device_socket,
     client_device,
-    KeyDevice, add_psychrometer_to_relay6, UpdatePsychrometerAPIView,
+    KeyDevice, add_psychrometer_to_relay6, UpdatePsychrometerAPIView, PsychrometerImageView,
 )
 
 urlpatterns = [
     path("", DeviceViewSet.as_view(), name="device-list"),
     path("raw/", KeyDevice.as_view(), name="list"),
+    path("psy-image/", PsychrometerImageView.as_view(), name="psy-images"),
     path("<str:device_id>/", search_device, name="search"),
     path("socket/<str:device_id>/", search_device_socket, name="docket"),
     path("client/<str:device_id>/", client_device, name="client"),

@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.shortcuts import get_object_or_404
 
 from room.models import Room, RoomDevice
-from .models import Relay10, Relay6, Device, Psychrometer
+from .models import Relay10, Relay6, Device, Psychrometer, PsychrometerImage
 
 
 class Relay6Serializer(serializers.ModelSerializer):
@@ -23,7 +23,6 @@ class DeviceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Device
         fields = "__all__"
-
 
 
 class Relay10Details(serializers.ModelSerializer):
@@ -116,6 +115,7 @@ class AddDeviceSerializer(serializers.Serializer):
         relay.save()
         return relay
 
+
 class PsychrometerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Psychrometer
@@ -175,3 +175,9 @@ class AddPsychrometerToRelay6Serializer(serializers.Serializer):
             "psychrometer": PsychrometerSerializer(self.psychrometer).data,
             "room_id": self.room_id
         }
+
+
+class PsychrometerImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PsychrometerImage
+        fields = "__all__"

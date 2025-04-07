@@ -1,11 +1,15 @@
 from django.contrib import admin
 from django.db import models
 
-from .models import Relay6, Relay10, Device, Psychrometer
+from .models import Relay6, Relay10, Device, Psychrometer, PsychrometerImage
 from django.utils import timezone
 from message_broker.message.message import Message
 from message_broker.producer.messager import send_broker_message
 from datetime import date
+
+from .views import PsychrometerImageView
+
+
 class Relay6Admin(admin.ModelAdmin):
     list_display = [
         "id",
@@ -76,6 +80,11 @@ class Relay10Admin(admin.ModelAdmin):
         # ذخیره مدل
         super().save_model(request, obj, form, change)
 
+
+class PsychrometerImageAdmin(admin.ModelAdmin):
+    pass
+
+
 class PsychrometerAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         obj.updated_at = timezone.now()
@@ -100,9 +109,14 @@ class PsychrometerAdmin(admin.ModelAdmin):
             _datetime=obj.updated_at.strftime("%m/%d/%y:%H:%M:%S")
         )
         send_broker_message(message=message)
+
+
 class DeviceAdmin(admin.ModelAdmin):
     pass
+
+
 admin.site.register(Relay6, Relay6Admin)
 admin.site.register(Relay10, Relay10Admin)
-admin.site.register(Device,DeviceAdmin)
-admin.site.register(Psychrometer,PsychrometerAdmin)
+admin.site.register(Device, DeviceAdmin)
+admin.site.register(Psychrometer, PsychrometerAdmin)
+admin.site.register(PsychrometerImage, PsychrometerImageAdmin)
