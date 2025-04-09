@@ -4,7 +4,7 @@ import django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings.dev')
 
 django.setup()
-
+from django.utils import timezone
 from message_broker.message.message import Message
 from message_broker.producer.messager import send_broker_message
 from .strategy_abs import MessageStrategy
@@ -54,7 +54,7 @@ class ConnectivityStrategy(MessageStrategy):
             device.is_online = is_online
             print("Device %s %s %S", device_id, "state", is_online)
             device.save()
-            _datetime = now()
+            _datetime = timezone.now().astimezone(timezone.get_current_timezone())
             payload = _datetime.strftime("%m/%d/%y:%H:%M:%S")
             message = Message(
                 payload=payload,
