@@ -27,17 +27,13 @@ class DeviceTimerView(viewsets.ModelViewSet):
     def send_relay_message(self, timer: DeviceTimer):
         relay_number = timer.relay_port_number  # شماره رله‌ای که تایمرش تغییر کرده
 
-        # پیدا کردن رله‌ای که به این دیوایس تعلق داره
-        related_relay = Relay10.objects.filter(
-            device_id=timer.device.device_id
-        ).first()
+        related_relay = timer.relay10  # مستقیم از فیلد relay10 استفاده می‌کنیم
 
         if not related_relay:
-            return  # رله‌ای پیدا نشد که مربوط به این دیوایس باشه
+            return  # اگر رله‌ای تنظیم نشده بود، پیام ارسال نشود
 
         # ساخت پیام برای همون رله
         payload = related_relay.get_schedular_date(relay_number)
-
         message = Message(
             payload=payload,
             _type="RS",
