@@ -6,6 +6,8 @@ from rest_framework.views import APIView
 from message_broker.message.message import Message
 from message_broker.producer.messager import send_broker_message
 from django.db import transaction
+from django.forms.models import model_to_dict
+
 from device.models import Relay10, Relay6, Device, Psychrometer, PsychrometerImage
 from device.serializers import (
     Relay10Serializer,
@@ -74,30 +76,46 @@ def search_device_socket(request, device_id):
     if request.method == "PATCH":
         devices = Relay10.objects.filter(device_id=device_id)
         if devices.exists():
-            serializer = Relay10Serializer(
-                devices.first(), data=request.data, partial=True
-            )
-        if not devices.exists():
+            device = devices.first()
+            serializer = Relay10Serializer(device, data=request.data, partial=True)
+        else:
             devices = Relay6.objects.filter(device_id=device_id)
             if devices.exists():
-                serializer = Relay6Serializer(
-                    devices.first(), data=request.data, partial=True
+                device = devices.first()
+                serializer = Relay6Serializer(device, data=request.data, partial=True)
+            else:
+                return Response(
+                    {"message": "object not found"}, status=status.HTTP_404_NOT_FOUND
                 )
-        if not devices.exists():
-            return Response(
-                {"message": "object not found"}, status=status.HTTP_404_NOT_FOUND
-            )
 
         serializer.is_valid(raise_exception=True)
+
+        # مقادیر قبلی قبل از ذخیره
+        old_data = model_to_dict(device, fields=[f"r{i}" for i in range(1, 11)])
+
+        # ذخیره تغییرات
         instance = serializer.save()
-        message = Message(
-            payload=instance.get_payload(), _type="WR", device_id=instance.device_id,_datetime=instance.get_time()
-        )
 
-        send_broker_message(message=message)
+        # مقادیر جدید بعد از ذخیره
+        new_data = model_to_dict(instance, fields=[f"r{i}" for i in range(1, 11)])
+
+        # پیدا کردن رله‌هایی که تغییر کرده‌اند
+        changed_relays = [
+            i for i in range(1, 11) if old_data.get(f"r{i}") != new_data.get(f"r{i}")
+        ]
+
+        # ارسال پیام فقط برای رله‌های تغییر کرده
+        for relay_number in changed_relays:
+            payload = instance.get_schedular_date(relay_number)
+            message = Message(
+                payload=payload,
+                _type="RS",
+                device_id=instance.device_id,
+                _datetime=instance.get_time(),
+            )
+            send_broker_message(message)
+
         return Response({"message": serializer.data})
-
-
 
 
 @api_view(("PATCH", "POST"))

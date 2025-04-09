@@ -374,8 +374,12 @@ class Relay10(BaseRelay):
             is_active=True,
             relay_port_number=relay_number,
         )
+        if getattr(self, f"r{relay_number}")== True:
+            return f"{relay_number:02}ffffffffffffffffffffffffffffffffffffffffff"
         if not device_timers.exists():
             return f"{relay_number:02}000000000000000000000000000000000000000000"
+
+
         schedule = [0] * (7 * 24)
         for device_timer in device_timers:
             days = device_timer.days
