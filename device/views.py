@@ -109,9 +109,9 @@ def search_device_socket(request, device_id):
             payload = instance.get_schedular_date(relay_number)
             message = Message(
                 payload=payload,
-                _type="RS",
+                _type="WS",
                 device_id=instance.device_id,
-                _datetime=instance.get_time(),
+                # _datetime=instance.get_time(),
             )
             send_broker_message(message)
 

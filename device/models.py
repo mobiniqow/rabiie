@@ -370,33 +370,47 @@ class Relay10(BaseRelay):
         return hex_result
 
     def get_schedular_date(self, relay_number):
+        # فیلتر کردن تایمرهای فعال برای شماره رله‌ی خاص
         device_timers = DeviceTimer.objects.filter(
             is_active=True,
             relay_port_number=relay_number,
         )
-        if getattr(self, f"r{relay_number}")== True:
-            return f"{relay_number:02}ffffffffffffffffffffffffffffffffffffffffff"
+
+        # اگر هیچ تایمری برای این رله وجود نداشته باشه
         if not device_timers.exists():
             return f"{relay_number:02}000000000000000000000000000000000000000000"
 
+        # اگر وضعیت فعلی رله روشن باشد (True)، کل بازه زمانی را فعال برمی‌گرداند
+        if getattr(self, f"r{relay_number}", False):
+            return f"{relay_number:02}" + "f" * 42
 
+        # یک لیست صفر با طول 168 (7 روز × 24 ساعت) برای برنامه‌ی زمانی
         schedule = [0] * (7 * 24)
+
         for device_timer in device_timers:
+            # days باید رشته‌ای با 7 کاراکتر ('1010101' به عنوان مثال) باشد
             days = device_timer.days
-            for i, day_active in enumerate(days):
-                if day_active == '1':
+            for day_index, is_active in enumerate(days):
+                if is_active == '1':
+                    # ساعات بین start_time و end_time را فعال کن
                     for hour in range(device_timer.start_time - 1, device_timer.end_time):
-                        index = i * 24 + hour
-                        if index < 7 * 24:
+                        index = day_index * 24 + hour
+                        if 0 <= index < 168:
                             schedule[index] = 1
+
+        # تبدیل به رشته باینری
         binary_result = ''.join(map(str, schedule))
-        print(f'binary_result i {binary_result}')
-        binary_result = self.reverse_week(binary_result)
-        print(f'reverse_week i {binary_result}')
+        print(f'binary_result: {binary_result}')
+
+        # برگرداندن ترتیب هفته (تابع باید از قبل تعریف شده باشه)
+        # binary_result = self.reverse_week(binary_result)
+        print(f'reversed binary_result: {binary_result}')
+
+        # تبدیل به رشته هگزادسیمال (تابع باید از قبل تعریف شده باشه)
         hex_result = self.binary_to_hex(binary_result)
 
-        result = f"{relay_number:02}{hex_result}"
-        return result
+        return f"{relay_number:02}{hex_result}"
+
 
     def reverse_day_binary(self, day_binary):
         return day_binary[::-1]

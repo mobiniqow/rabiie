@@ -109,7 +109,7 @@ class AddDeviceSerializer(serializers.Serializer):
         if Relay10.objects.filter(device_id=device_id).exists():
             relay = Relay10.objects.get(device_id=device_id)
         else:
-            relay = Relay6.objects.get(device_id=device_id)
+            relay = Relay6.objects.get(device_id=device_id).order_by('id')[-1]
         setattr(relay, f'device_r{self.data["port"]}', device)
         setattr(relay, f'name{self.data["port"]}', self.data["name"])
         relay.save()

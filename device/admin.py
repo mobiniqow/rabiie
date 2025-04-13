@@ -70,7 +70,7 @@ class Relay10Admin(admin.ModelAdmin):
             payload = obj.get_schedular_date(relay_number)
             message = Message(
                 payload=payload,
-                _type="RS",
+                _type="WS",
                 device_id=obj.device_id,
                 # _datetime=obj.get_time(),  # زمان دقیق به فرمت درست
             )

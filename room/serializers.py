@@ -30,7 +30,6 @@ class RoomSerializer(serializers.ModelSerializer):
 
 class RoomDeviceSerializer(serializers.ModelSerializer):
     room = serializers.PrimaryKeyRelatedField(queryset=Room.objects.all(), write_only=True)
-
     device = DeviceSerializer(read_only=True)
     psychrometer = PsychrometerSerializer(read_only=True)
 

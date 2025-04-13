@@ -20,6 +20,8 @@ class RoomView(ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         return Room.objects.filter(user=user)
+
+
 class RoomDeviceListAPIView(APIView):
     def get(self, request, room_id):
         room_devices = RoomDevice.objects.filter(room_id=room_id)
@@ -27,61 +29,84 @@ class RoomDeviceListAPIView(APIView):
 
         for rd in room_devices:
             if rd.device:
-                # بررسی Relay6
-                relay6_fields = [f'device_r{i}' for i in range(1, 7)]
-                for i, field in enumerate(relay6_fields, start=1):
-                    relay = Relay6.objects.filter(**{field: rd.device}).first()
-                    if relay:
-                        response_data.append({
-                            "type": "Device",
-                            "device_id": str(rd.device.id),
-                            "device_name": rd.device.name,
-                            "device_image": rd.device.image.url if rd.device.image else None,
-                            "connected_to": "Relay6",
-                            "relay_id": str(relay.id),
-                            "port_number": i,
-                            "port_name": getattr(relay, f'name{i}', ''),
-                            "relay_state": getattr(relay, f'r{i}'),
-                        })
+                device_id = str(rd.device.id)
+                device_info = {
+                    "type": "Device",
+                    "device_id": device_id,
+                    "device_name": rd.device.name,
+                    "device_image": rd.device.image.url if rd.device.image else None,
+                }
 
-                # بررسی Relay10
-                relay10_fields = [f'device_r{i}' for i in range(1, 11)]
-                for i, field in enumerate(relay10_fields, start=1):
-                    relay = Relay10.objects.filter(**{field: rd.device}).first()
-                    if relay:
-                        response_data.append({
-                            "type": "Device",
-                            "device_id": str(rd.device.id),
-                            "device_name": rd.device.name,
-                            "device_image": rd.device.image.url if rd.device.image else None,
-                            "connected_to": "Relay10",
-                            "relay_id": str(relay.id),
-                            "port_number": i,
-                            "port_name": getattr(relay, f'name{i}', ''),
-                            "relay_state": getattr(relay, f'r{i}'),
-                        })
+                relay6_ports = [
+                    (relay, i)
+                    for i in range(1, 7)
+                    for relay in Relay6.objects.filter(**{f'device_r{i}': rd.device})
+                    if getattr(relay, f'device_r{i}') == rd.device
+                ]
+
+                relay10_ports = [
+                    (relay, i)
+                    for i in range(1, 11)
+                    for relay in Relay10.objects.filter(**{f'device_r{i}': rd.device})
+                    if getattr(relay, f'device_r{i}') == rd.device
+                ]
+
+                for relay, port in relay6_ports:
+                    response_data.append({
+                        **device_info,
+                        "connected_to": "Relay6",
+                        "relay_id": str(relay.id),
+                        "port_number": port,
+                        "port_name": getattr(relay, f'name{port}', ''),
+                        "relay_state": getattr(relay, f'r{port}'),
+                    })
+
+                for relay, port in relay10_ports:
+                    response_data.append({
+                        **device_info,
+                        "connected_to": "Relay10",
+                        "relay_id": str(relay.id),
+                        "port_number": port,
+                        "port_name": getattr(relay, f'name{port}', ''),
+                        "relay_state": getattr(relay, f'r{port}'),
+                    })
 
             elif rd.psychrometer:
-                for i in range(1, 7):
-                    relay = Relay6.objects.filter(**{f't{i}': rd.psychrometer}).first()
-                    if relay:
-                        response_data.append({
-                            "type": "Psychrometer",
-                            "psychrometer_id": str(rd.psychrometer.id),
-                            "psychrometer_name": rd.psychrometer.name,
-                            "psychrometer_image": rd.psychrometer.image.image.url if rd.psychrometer.image and rd.psychrometer.image.image else None,
-                            "connected_to": "Relay6",
-                            "relay_id": str(relay.id),
-                            "port_number": i,
-                            "port_name": getattr(relay, f'name{i}', ''),
-                            "relay_state": getattr(relay, f'r{i}'),
-                            "mode": rd.psychrometer.get_mod_display(),
-                            "current_value": rd.psychrometer.current_value,
-                            "destination_value": rd.psychrometer.destination_value,
-                            "tolerance": rd.psychrometer.tolerance,
-                        })
+                psychrometer_id = str(rd.psychrometer.id)
+                psychrometer_info = {
+                    "type": "Psychrometer",
+                    "psychrometer_id": psychrometer_id,
+                    "psychrometer_name": rd.psychrometer.name,
+                    "psychrometer_image": (
+                        rd.psychrometer.image.image.url
+                        if rd.psychrometer.image and rd.psychrometer.image.image
+                        else None
+                    ),
+                    "mode": rd.psychrometer.get_mod_display(),
+                    "current_value": rd.psychrometer.current_value,
+                    "destination_value": rd.psychrometer.destination_value,
+                    "tolerance": rd.psychrometer.tolerance,
+                }
+
+                relay6_ports = [
+                    (relay, i)
+                    for i in range(1, 7)
+                    for relay in Relay6.objects.filter(**{f't{i}': rd.psychrometer})
+                    if getattr(relay, f't{i}') == rd.psychrometer
+                ]
+
+                for relay, port in relay6_ports:
+                    response_data.append({
+                        **psychrometer_info,
+                        "connected_to": "Relay6",
+                        "relay_id": str(relay.id),
+                        "port_number": port,
+                        "port_name": getattr(relay, f'name{port}', ''),
+                        "relay_state": getattr(relay, f'r{port}'),
+                    })
 
         return Response(response_data, status=status.HTTP_200_OK)
+
 
 class RoomDeviceView(APIView):
     def get(self, request, room_id):
@@ -106,7 +131,7 @@ class RoomDeviceView(APIView):
             "room_devices": device_serializer.data,
             "relay10": r10_serializer.data,
             "relay6": r6_serializer.data,
-            "device_ids":device_ids
+            "device_ids": device_ids
         })
 
     def post(self, request, room_id):
