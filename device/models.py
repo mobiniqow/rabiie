@@ -375,6 +375,8 @@ class Relay10(BaseRelay):
             relay_port_number=relay_number,
         )
         if not device_timers.exists():
+            if getattr(self, f"r{relay_number}")==True:
+                return f"{relay_number:02}ffffffffffffffffffffffffffffffffffffffffff"
             return f"{relay_number:02}000000000000000000000000000000000000000000"
         schedule = [0] * (7 * 24)
         for device_timer in device_timers:

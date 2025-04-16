@@ -64,6 +64,18 @@ class ConnectivityStrategy(MessageStrategy):
             )
             time.sleep(0.3)
             self.output(message)
+
+            for relay_number in range(1, 11):
+                payload = device.get_schedular_date(relay_number)
+                message = Message(
+                    payload=payload,
+                    _type="WS",
+                    device_id=device_id,
+                    _datetime="",
+                )
+
+                self.output(message)
+            time.sleep(0.73)
             # bayad be hamin device akharin tanzimat ro ersal konim
 
     def output(self, message: Message):
