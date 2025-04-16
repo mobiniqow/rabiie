@@ -29,6 +29,7 @@ TEMPLATES = [
         },
     },
 ]
+
 ALLOWED_HOSTS = ["*"]
 STATIC_URL = "/static/"
 STATIC_ROOT = "/var/www/html/iot/staticfiles"

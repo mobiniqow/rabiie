@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
-from .views import RoomView, RoomDeviceView, RoomPictureList, RoomDeviceListAPIView
+from .views import RoomView, RoomPictureList, RoomDeviceListAPIView
 
 router = DefaultRouter()
 router.register("", RoomView, basename="rooms")

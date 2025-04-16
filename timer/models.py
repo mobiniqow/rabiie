@@ -20,9 +20,9 @@ class DeviceTimer(models.Model):
     relay10 = models.ForeignKey(
         "device.Relay10", on_delete=models.SET_NULL, blank=True, null=True
     )
-    relay6 = models.ForeignKey(
-        "device.Relay6", on_delete=models.SET_NULL, blank=True, null=True
-    )
+    # relay6 = models.ForeignKey(
+    #     "device.Relay6", on_delete=models.SET_NULL, blank=True, null=True
+    # )
     relay_port_number = models.IntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(12)]
     )

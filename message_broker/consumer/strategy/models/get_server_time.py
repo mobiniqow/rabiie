@@ -21,7 +21,7 @@ class ServerTimeStrategy(MessageStrategy):
         device_id = message.device_id
         device, _type, relay_size = get_device_by_id(device_id=device_id)
         payload = message.get_body()
-        _datetime = timezone.now()
+        _datetime = timezone.now().astimezone(timezone.get_current_timezone())
         if message.payload == "":
             payload = _datetime.strftime("%m/%d/%y:%H:%M:%S")
             message = Message(
@@ -40,9 +40,8 @@ class ServerTimeStrategy(MessageStrategy):
 
             # Convert the time_from_message (string) to a datetime object (naive)
             time_from_message_datetime = datetime.strptime(time_from_message, "%m/%d/%y:%H:%M:%S")
-
-            # Make the naive datetime object aware by using the timezone
-            time_from_message_datetime = timezone.make_aware(time_from_message_datetime, timezone.get_current_timezone())
+            time_from_message_datetime = timezone.make_aware(time_from_message_datetime,
+                                                             timezone.get_current_timezone())
 
             print(f"device.updated_at: {device.updated_at}")
             print(f"time_from_message_datetime: {time_from_message_datetime}")

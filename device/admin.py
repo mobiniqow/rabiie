@@ -1,3 +1,5 @@
+import time
+
 from django.contrib import admin
 from django.db import models
 
@@ -39,47 +41,44 @@ class Relay6Admin(admin.ModelAdmin):
 
 
 class Relay10Admin(admin.ModelAdmin):
-    list_display = [
-        "id",
-        "state",
-        "device_id",
-        "user",
-    ]
-    list_filter = [
-        "state",
-        "device_id",
-    ]
-    search_fields = [
-        "device_id",
-    ]
-    list_editable = [
-        "state",
-    ]
-    readonly_fields = [
-        "updated_at",
-        "created_at",
-    ]
+    list_display = ["id", "state", "device_id", "user"]
+    list_filter = ["state", "device_id"]
+    search_fields = ["device_id"]
+    list_editable = ["state"]
+    readonly_fields = ["updated_at", "created_at"]
     list_per_page = 20
 
     def get_queryset(self, request):
         return super().get_queryset(request).select_related("user")
 
     def save_model(self, request, obj, form, change):
-        # به روز رسانی دستی updated_at
-        obj.updated_at = timezone.now()  # زمان فعلی را به روز رسانی می‌کنیم
+        # زمان فعلی
+        obj.updated_at = timezone.now()
 
-        # ارسال پیام برای بروکر
-        message = Message(
-            payload=obj.get_payload(),
-            _type="WR",
-            device_id=obj.device_id,
-            _datetime=obj.updated_at.strftime("%m/%d/%y:%H:%M:%S")  # فرمت صحیح تاریخ و زمان
-        )
-        send_broker_message(message=message)
+        # تغییرات فقط روی r1 تا r10
+        changed_relays = []
+        if change:
+            old_obj: Relay10 = Relay10.objects.get(pk=obj.pk)
+            for i in range(1, 11):
+                old_val = getattr(old_obj, f"r{i}")
+                new_val = getattr(obj, f"r{i}")
+                if old_val != new_val:
+                    changed_relays.append(i)
 
-        # ذخیره مدل
+        # برای هر رله‌ای که تغییر کرده، پیام جداگانه بفرست
+        for relay_number in changed_relays:
+            payload = obj.get_schedular_date(relay_number)
+            message = Message(
+                payload=payload,
+                _type="WS",
+                device_id=obj.device_id,
+                # _datetime=obj.get_time(),  # زمان دقیق به فرمت درست
+            )
+            time.sleep(1)
+            send_broker_message(message)
+
+        # ذخیره شیء
         super().save_model(request, obj, form, change)
-
 
 class PsychrometerImageAdmin(admin.ModelAdmin):
     pass
