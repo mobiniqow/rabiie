@@ -122,7 +122,6 @@ def search_device_socket(request, device_id):
 def client_device(request, device_id):
     try:
         with transaction.atomic():
-            # بررسی روش درخواست (PATCH یا POST)
             if request.method == "PATCH":
                 # ابتدا تلاش می‌کنیم دستگاه را پیدا کنیم
                 devices = Relay10.objects.filter(device_id=device_id)
@@ -157,8 +156,10 @@ def client_device(request, device_id):
             elif request.method == "POST":
                 devices = Relay10.objects.filter(device_id=device_id)
                 if devices.exists():
+                    type = "r10"
                     relay = devices.first()
                 else:
+                    type = "r6"
                     devices = Relay6.objects.filter(device_id=device_id)
                     if devices.exists():
                         relay = devices.first()
@@ -167,11 +168,11 @@ def client_device(request, device_id):
                         "message": len(Relay10.objects.filter(device_id=device_id)),
                         "id": device_id,
                     }, status=status.HTTP_404_NOT_FOUND)
-                relay.reset()
+                # relay.reset()
                 if relay.user != request.user:
                     return Response({"message": "invalid user"}, status=status.HTTP_400_BAD_REQUEST)
                 serializer = AddDeviceSerializer(data=request.data, context={"device_id": device_id,
-                                                                             "devices":devices[0].id})
+                                                                             "devices": devices[0].id})
                 if serializer.is_valid():
                     room_id = request.POST["room_id"]
                     if room_id:
@@ -181,9 +182,12 @@ def client_device(request, device_id):
                             relay.save()
                         except Room.DoesNotExist:
                             return Response({"message": "Room not found"}, status=status.HTTP_404_NOT_FOUND)
-                    serializer.save()
+                    # serializer.save()
                     new_device = Device.objects.get(id=request.POST["device"])
-                    RoomDevice.objects.create(room=room,device=new_device)
+                    if type == "r6":
+                        RoomDevice.objects.create(room=room, relay_6=relay, port=request.POST["port"])
+                    else:
+                        RoomDevice.objects.create(room=room, relay_8=relay, port=request.POST["port"])
                     return Response({"message": serializer.data})
                 else:
                     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -195,8 +199,8 @@ def client_device(request, device_id):
 
 class DeviceViewSet(APIView):
     def get(
-        self,
-        request,
+            self,
+            request,
     ):
         r10_devices = Relay10.objects.filter(user=request.user)
         r6_devices = Relay6.objects.filter(user=request.user)
@@ -209,6 +213,7 @@ class KeyDevice(ListAPIView):
     queryset = Device.objects.all()
     serializer_class = DeviceSerializer
 
+
 class PsychrometerImageView(ListAPIView):
     queryset = PsychrometerImage.objects.all()
     serializer_class = PsychrometerImageSerializer
@@ -220,7 +225,7 @@ class PsychrometerImageView(ListAPIView):
 #
 #     return Response(serializer.data)
 
-@api_view(["POST",])
+@api_view(["POST", ])
 def add_psychrometer_to_relay6(request, relay6_id):
     try:
         with transaction.atomic():
@@ -236,7 +241,8 @@ def add_psychrometer_to_relay6(request, relay6_id):
                     # ذخیره‌سازی داده‌ها
                     serializer.save()
 
-                    return Response({"message": "Psychrometer added successfully", "data": serializer.data}, status=status.HTTP_201_CREATED)
+                    return Response({"message": "Psychrometer added successfully", "data": serializer.data},
+                                    status=status.HTTP_201_CREATED)
                 else:
                     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -247,10 +253,12 @@ def add_psychrometer_to_relay6(request, relay6_id):
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
 class UpdatePsychrometerAPIView(APIView):
     def patch(self, request, relay6_id, port):
         if port < 1 or port > 6:
-            return Response({"error": "Invalid port number. Must be between 1 and 6."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Invalid port number. Must be between 1 and 6."},
+                            status=status.HTTP_400_BAD_REQUEST)
 
         relay = get_object_or_404(Relay6, id=relay6_id)
         psychrometer = getattr(relay, f"t{port}", None)

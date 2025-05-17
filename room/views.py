@@ -104,8 +104,8 @@ class RoomDeviceListAPIView(APIView):
                         "port_name": getattr(relay, f'name{port}', ''),
                         "relay_state": getattr(relay, f'r{port}'),
                     })
-
-        return Response(response_data, status=status.HTTP_200_OK)
+        serializer = RoomDeviceSerializer(room_devices,many=True).data
+        return Response(serializer, status=status.HTTP_200_OK)
 
 
 class RoomDeviceView(APIView):

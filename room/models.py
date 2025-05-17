@@ -1,6 +1,6 @@
 from django.db import models
 from authenticate.models import User
-from device.models import Relay6, Relay10
+from device.models import Relay6, Relay10, Device, Psychrometer
 
 
 class RoomPicture(models.Model):
@@ -29,4 +29,5 @@ class RoomDevice(models.Model):
     relay_8 = models.ForeignKey(Relay10, on_delete=models.SET_NULL, null=True, blank=True)
     port = models.IntegerField(null=True, blank=True)
     psy_port_number = models.IntegerField(null=True, blank=True)
-    # device = models.ForeignKey(UserDevice, on_delete=models.SET_NULL, null=True)
+    device = models.ForeignKey(Device, on_delete=models.SET_NULL, null=True)
+    psychrometer = models.ForeignKey(Psychrometer, on_delete=models.SET_NULL, null=True, blank=True)
