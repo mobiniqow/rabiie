@@ -39,7 +39,7 @@ class TemperatureStrategy(MessageStrategy):
                     payload=f'{int(payload[:2]):02}{new_payload}',
                     _type="WH",
                     device_id=device_id,
-                    _datetime=device.updated_at.strftime("%m/%d/%y:%H:%M:%S")
+                    # _datetime=device.updated_at.strftime("%m/%d/%y:%H:%M:%S")
                 )
                 import time
                 time.sleep(0.5)
@@ -52,7 +52,7 @@ class TemperatureStrategy(MessageStrategy):
                     payload=new_payload,
                     _type="WH",
                     device_id=device_id,
-                    _datetime=device.updated_at.strftime("%m/%d/%y:%H:%M:%S")
+                    # _datetime=device.updated_at.strftime("%m/%d/%y:%H:%M:%S")
                 )
                 import time
                 time.sleep(0.5)
@@ -66,7 +66,7 @@ class TemperatureStrategy(MessageStrategy):
                     payload=f'{int(payload[:2]):02}{new_payload}',
                     _type="WH",
                     device_id=device_id,
-                    _datetime=device.updated_at.strftime("%m/%d/%y:%H:%M:%S")
+                    # _datetime=device.updated_at.strftime("%m/%d/%y:%H:%M:%S")
                 )
                 import time
                 time.sleep(0.5)

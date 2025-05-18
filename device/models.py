@@ -50,6 +50,8 @@ class Psychrometer(models.Model):
         return self.name
 
     def get_body(self):
+        # WH01111165403  shomareport:2 hc:1 manual:1 on-of:1 manfi/mosbat:1 meghdarnah
+        # aie:3 telerance:2
         return (
             f"{int(self.hc)}{int(self.ma)}{int(self.on_of)}{int(self.plus_minus)}"
             f"{self.destination_value:03}{self.tolerance:02}"
