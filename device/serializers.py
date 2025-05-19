@@ -12,11 +12,6 @@ class Relay6Serializer(serializers.ModelSerializer):
         read_only_fields = ("id", "device_id", "user")
 
 
-class Relay10Serializer(serializers.ModelSerializer):
-    class Meta:
-        model = Relay10
-        fields = "__all__"
-        read_only_fields = ("id", "device_id", "user")
 
 
 class DeviceSerializer(serializers.ModelSerializer):
@@ -24,6 +19,22 @@ class DeviceSerializer(serializers.ModelSerializer):
         model = Device
         fields = "__all__"
 
+class Relay10Serializer(serializers.ModelSerializer):
+
+    device_r1 = DeviceSerializer(read_only=True)
+    device_r2 = DeviceSerializer(read_only=True)
+    device_r3 = DeviceSerializer(read_only=True)
+    device_r4 = DeviceSerializer(read_only=True)
+    device_r5 = DeviceSerializer(read_only=True)
+    device_r6 = DeviceSerializer(read_only=True)
+    device_r7 = DeviceSerializer(read_only=True)
+    device_r8 = DeviceSerializer(read_only=True)
+    device_r9 = DeviceSerializer(read_only=True)
+    device_r10 = DeviceSerializer(read_only=True)
+    class Meta:
+        model = Relay10
+        fields = "__all__"
+        read_only_fields = ("id", "device_id", "user")
 
 class Relay10Details(serializers.ModelSerializer):
     class Meta:
@@ -97,6 +108,10 @@ class Relay6Details(serializers.ModelSerializer):
         }
         return response
 
+class PsychrometerImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PsychrometerImage
+        fields = "__all__"
 
 class AddDeviceSerializer(serializers.Serializer):
     port = serializers.IntegerField()
@@ -117,6 +132,7 @@ class AddDeviceSerializer(serializers.Serializer):
 
 
 class PsychrometerSerializer(serializers.ModelSerializer):
+    image = PsychrometerImageSerializer(read_only=True)
     class Meta:
         model = Psychrometer
         fields = '__all__'
@@ -177,7 +193,3 @@ class AddPsychrometerToRelay6Serializer(serializers.Serializer):
         }
 
 
-class PsychrometerImageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PsychrometerImage
-        fields = "__all__"
