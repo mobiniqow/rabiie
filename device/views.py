@@ -122,78 +122,79 @@ def search_device_socket(request, device_id):
 def client_device(request, device_id):
     try:
         with transaction.atomic():
+            relay = None
+            relay_type = None
+
+            if Relay10.objects.filter(device_id=device_id).exists():
+                relay = Relay10.objects.get(device_id=device_id)
+                relay_type = "r10"
+                serializer_class = Relay10Serializer
+            elif Relay6.objects.filter(device_id=device_id).exists():
+                relay = Relay6.objects.get(device_id=device_id)
+                relay_type = "r6"
+                serializer_class = Relay6Serializer
+            else:
+                return Response({"message": "Device not found"}, status=status.HTTP_404_NOT_FOUND)
+
+            # PATCH method
             if request.method == "PATCH":
-                # ابتدا تلاش می‌کنیم دستگاه را پیدا کنیم
-                devices = Relay10.objects.filter(device_id=device_id)
-                if devices.exists():
-                    serializer = Relay10Serializer(devices.first(), data=request.data, partial=True)
-                else:
-                    devices = Relay6.objects.filter(device_id=device_id)
-                    if devices.exists():
-                        serializer = Relay6Serializer(devices.first(), data=request.data, partial=True)
-
-                # اگر دستگاهی پیدا نشد
-                if not devices.exists():
-                    return Response({"message": "object not found"}, status=status.HTTP_404_NOT_FOUND)
-
-                # بررسی صحت داده‌ها
+                serializer = serializer_class(relay, data=request.data, partial=True)
                 serializer.is_valid(raise_exception=True)
                 serializer.save()
 
-                # اگر room_id وجود داشته باشد، به روم اضافه کنیم
                 room_id = request.data.get("room_id")
                 if room_id:
                     try:
                         room = Room.objects.get(id=room_id)
-                        device = serializer.instance
-                        device.room = room  # ارتباط دادن دستگاه به روم
-                        device.save()
+                        relay.room = room
+                        relay.save()
                     except Room.DoesNotExist:
                         return Response({"message": "Room not found"}, status=status.HTTP_404_NOT_FOUND)
 
                 return Response({"message": serializer.data})
 
+            # POST method
             elif request.method == "POST":
-                devices = Relay10.objects.filter(device_id=device_id)
-                if devices.exists():
-                    type = "r10"
-                    relay = devices.first()
-                else:
-                    type = "r6"
-                    devices = Relay6.objects.filter(device_id=device_id)
-                    if devices.exists():
-                        relay = devices.first()
-                if not devices.exists():
-                    return Response({
-                        "message": len(Relay10.objects.filter(device_id=device_id)),
-                        "id": device_id,
-                    }, status=status.HTTP_404_NOT_FOUND)
                 # relay.reset()
+
                 if relay.user != request.user:
                     return Response({"message": "invalid user"}, status=status.HTTP_400_BAD_REQUEST)
-                serializer = AddDeviceSerializer(data=request.data, context={"device_id": device_id,
-                                                                             "devices": devices[0].id})
+
+                serializer = AddDeviceSerializer(
+                    data=request.data,
+                    context={"device_id": device_id, "devices": relay.id}
+                )
+
                 if serializer.is_valid():
-                    room_id = request.POST["room_id"]
-                    if room_id:
-                        try:
-                            room = Room.objects.get(id=room_id)
-                            relay.room = room
-                            relay.save()
-                        except Room.DoesNotExist:
-                            return Response({"message": "Room not found"}, status=status.HTTP_404_NOT_FOUND)
-                    # serializer.save()
-                    new_device = Device.objects.get(id=request.POST["device"])
-                    if type == "r6":
-                        RoomDevice.objects.create(room=room, relay_6=relay, port=request.POST["port"])
+                    room_id = request.data.get("room_id")
+                    port = int(request.data.get("port"))  # مطمئن شو این int هست
+                    device_fk_id = request.data.get("device")
+                    name = request.data.get("name")
+
+                    try:
+                        room = Room.objects.get(id=room_id)
+                        device_fk = Device.objects.get(id=device_fk_id)
+                    except Room.DoesNotExist:
+                        return Response({"message": "Room not found"}, status=status.HTTP_404_NOT_FOUND)
+                    except Device.DoesNotExist:
+                        return Response({"message": "Device not found"}, status=status.HTTP_404_NOT_FOUND)
+
+                    # ست کردن فیلد مربوطه از نوع device_r{port} و name{port}
+                    setattr(relay, f'device_r{port}', device_fk)
+                    setattr(relay, f'name{port}', name)
+                    relay.room = room
+                    relay.save()
+
+                    if relay_type == "r6":
+                        RoomDevice.objects.create(room=room, relay_6=relay, port=port)
                     else:
-                        RoomDevice.objects.create(room=room, relay_8=relay, port=request.POST["port"])
+                        RoomDevice.objects.create(room=room, relay_8=relay, port=port)
+
                     return Response({"message": serializer.data})
-                else:
-                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     except Exception as e:
-        # هر ارور غیرمنتظره‌ای که پیش آمد، همه چیز رو رول بک می‌کنیم
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 

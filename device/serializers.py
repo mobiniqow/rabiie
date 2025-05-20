@@ -118,17 +118,22 @@ class AddDeviceSerializer(serializers.Serializer):
     device = serializers.UUIDField()
     name = serializers.CharField(max_length=39)
 
-    def create(self, validated_data):
-        device_id = self.context.get("device_id")
-        device = Device.objects.get(id=self.data["device"])
-        if Relay10.objects.filter(device_id=device_id).exists():
-            relay = Relay10.objects.get(device_id=device_id)
-        else:
-            relay = Relay6.objects.get(device_id=device_id).order_by('id')[-1]
-        setattr(relay, f'device_r{self.data["port"]}', device)
-        setattr(relay, f'name{self.data["port"]}', self.data["name"])
-        relay.save()
-        return relay
+    # def create(self, validated_data):
+    #     device_id = self.context.get("device_id")
+    #     device = validated_data["device"]
+    #     port = validated_data["port"]
+    #     name = validated_data["name"]
+    #
+    #     if Relay10.objects.filter(device_id=device_id).exists():
+    #         relay = Relay10.objects.get(device_id=device_id)
+    #     else:
+    #         relay = Relay6.objects.filter(device_id=device_id).order_by('id').last()
+    #
+    #     # ست کردن دستگاه به پورت مربوطه
+    #     setattr(relay, f'device_r{port}', device)
+    #     setattr(relay, f'name{port}', name)
+    #     relay.save()
+    #     return relay
 
 
 class PsychrometerSerializer(serializers.ModelSerializer):
