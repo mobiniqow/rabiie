@@ -156,21 +156,17 @@ def client_device(request, device_id):
             # POST method
             elif request.method == "POST":
                 # relay.reset()
-
                 if relay.user != request.user:
                     return Response({"message": "invalid user"}, status=status.HTTP_400_BAD_REQUEST)
-
                 serializer = AddDeviceSerializer(
                     data=request.data,
                     context={"device_id": device_id, "devices": relay.id}
                 )
-
                 if serializer.is_valid():
                     room_id = request.data.get("room_id")
                     port = int(request.data.get("port"))  # مطمئن شو این int هست
                     device_fk_id = request.data.get("device")
                     name = request.data.get("name")
-
                     try:
                         room = Room.objects.get(id=room_id)
                         device_fk = Device.objects.get(id=device_fk_id)
