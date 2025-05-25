@@ -388,11 +388,9 @@ class Relay10(BaseRelay):
         if getattr(self, f"r{relay_number}", False):
             return f"{relay_number:02}" + "f" * 42
 
-        # یک لیست صفر با طول 168 (7 روز × 24 ساعت) برای برنامه‌ی زمانی
         schedule = [0] * (7 * 24)
 
         for device_timer in device_timers:
-            # days باید رشته‌ای با 7 کاراکتر ('1010101' به عنوان مثال) باشد
             days = device_timer.days
             for day_index, is_active in enumerate(days):
                 if is_active == '1':
