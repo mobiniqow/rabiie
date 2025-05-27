@@ -378,36 +378,34 @@ class Relay10(BaseRelay):
             relay_port_number=relay_number,
         )
 
-        # اگر هیچ تایمری برای این رله وجود نداشته باشه
+        # اگر هیچ تایمری برای این رله وجود نداشته باشد
         if not device_timers.exists():
             if getattr(self, f"r{relay_number}") == True:
-                return f"{relay_number:02}ffffffffffffffffffffffffffffffffffffffffff"
-            return f"{relay_number:02}000000000000000000000000000000000000000000"
+                return f"{relay_number:02}" + "f" * 42
+            return f"{relay_number:02}" + "0" * 42
 
         # اگر وضعیت فعلی رله روشن باشد (True)، کل بازه زمانی را فعال برمی‌گرداند
         if getattr(self, f"r{relay_number}", False):
             return f"{relay_number:02}" + "f" * 42
 
+        # ایجاد آرایه باینری 168 تایی (7 روز * 24 ساعت)
         schedule = [0] * (7 * 24)
 
         for device_timer in device_timers:
-            days = device_timer.days
+            days = device_timer.days  # رشته 7 کاراکتری (مثلاً '1010101')
             for day_index, is_active in enumerate(days):
                 if is_active == '1':
                     start = max(0, min(23, device_timer.start_time))
                     end = max(start + 1, min(24, device_timer.end_time))
                     for hour in range(start, end):
-                        hour_adjusted = hour - 1  # یک ساعت عقب
-                        index = day_index * 24 + hour_adjusted
+                        index = day_index * 24 + hour
                         if 0 <= index < 168:
                             schedule[index] = 1
 
         binary_result = ''.join(map(str, schedule))
-        print(f'binary_result: {binary_result}')
 
-        # اگر می‌خوای هفته رو برعکس کنی
+        # اگر لازم است هفته را برعکس کنی
         binary_result = binary_result[::-1]
-        print(f'reversed binary_result: {binary_result}')
 
         hex_result = self.binary_to_hex(binary_result)
         return f"{relay_number:02}{str(hex_result)}"
