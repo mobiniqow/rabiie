@@ -20,6 +20,16 @@ class DeviceTimerView(viewsets.ModelViewSet):
         instance = serializer.save(user=self.request.user)
         self.send_relay_message(instance)
 
+    def perform_destroy(self, instance):
+        instance.delete()  # بعد حذف کن
+        payload = instance.relay10.get_schedular_date(instance.relay_port_number)
+        message = Message(
+            payload=payload,
+            _type="WS",
+            device_id=instance.relay10.device_id,
+            # _datetime=related_relay.get_time(),
+        )
+        send_broker_message(message)
     def send_relay_message(self, timer: DeviceTimer):
         relay_number = timer.relay_port_number  # شماره رله‌ای که تایمرش تغییر کرده
 

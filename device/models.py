@@ -380,7 +380,7 @@ class Relay10(BaseRelay):
 
         # اگر هیچ تایمری برای این رله وجود نداشته باشه
         if not device_timers.exists():
-            if getattr(self, f"r{relay_number}")==True:
+            if getattr(self, f"r{relay_number}") == True:
                 return f"{relay_number:02}ffffffffffffffffffffffffffffffffffffffffff"
             return f"{relay_number:02}000000000000000000000000000000000000000000"
 
@@ -394,25 +394,23 @@ class Relay10(BaseRelay):
             days = device_timer.days
             for day_index, is_active in enumerate(days):
                 if is_active == '1':
-                    # ساعات بین start_time و end_time را فعال کن
-                    for hour in range(device_timer.start_time - 1, device_timer.end_time):
-                        index = day_index * 24 + hour
+                    start = max(0, min(23, device_timer.start_time))
+                    end = max(start + 1, min(24, device_timer.end_time))
+                    for hour in range(start, end):
+                        hour_adjusted = hour - 1  # یک ساعت عقب
+                        index = day_index * 24 + hour_adjusted
                         if 0 <= index < 168:
                             schedule[index] = 1
 
-        # تبدیل به رشته باینری
         binary_result = ''.join(map(str, schedule))
         print(f'binary_result: {binary_result}')
 
-        # برگرداندن ترتیب هفته (تابع باید از قبل تعریف شده باشه)
-        # binary_result = self.reverse_week(binary_result)
+        # اگر می‌خوای هفته رو برعکس کنی
+        binary_result = binary_result[::-1]
         print(f'reversed binary_result: {binary_result}')
 
-        # تبدیل به رشته هگزادسیمال (تابع باید از قبل تعریف شده باشه)
         hex_result = self.binary_to_hex(binary_result)
-
-        return f"{relay_number:02}{hex_result}"
-
+        return f"{relay_number:02}{str(hex_result)}"
 
     def reverse_day_binary(self, day_binary):
         return day_binary[::-1]
